@@ -41,15 +41,43 @@ const TypeWriter = ({ text, onComplete }) => {
   );
 };
 
-const WordContainer = ({ children, word }) => (
-  <motion.div
-    data-word={word}
-    className="relative text-6xl md:text-8xl font-bold whitespace-nowrap"
-    whileHover={{ scale: 1.05 }}
-  >
-    {children}
-  </motion.div>
-);
+const WordContainer = ({ children, word }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      data-word={word}
+      className="relative text-6xl md:text-8xl font-bold whitespace-nowrap cursor-pointer"
+      whileHover={{ scale: 1.05 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <svg width="100%" height="100%" className="absolute inset-0" style={{ zIndex: 1 }}>
+        <text
+          x="50%"
+          y="50%"
+          dominantBaseline="middle"
+          textAnchor="middle"
+          className="text-6xl md:text-8xl font-bold"
+          fill={isHovered ? '#1a2b66' : 'white'} // Navy blue fill on hover
+          stroke={isHovered ? '#1a2b66' : 'black'} // Black stroke initially, navy on hover
+          strokeWidth="1"
+          style={{
+            transition: 'fill 0.3s ease, stroke 0.3s ease',
+          }}
+        >
+          {typeof children === 'string' ? children : word}
+        </text>
+      </svg>
+      <div 
+        className="relative opacity-0"
+        style={{ zIndex: 0 }}
+      >
+        {children}
+      </div>
+    </motion.div>
+  );
+};
 
 const AnimatedTitle = () => {
   const [activeWordIndex, setActiveWordIndex] = useState(0);
