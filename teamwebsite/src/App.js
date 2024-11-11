@@ -7,6 +7,7 @@ import JoinRequestsManagement from './pages/admin/JoinRequestsManagement';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/auth//Login';
 import Register from './pages/auth/Register';
+import JoinUs from './pages/JoinUs';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/team" element={<Team />} />
+       < Route path="/join-us" element={<JoinUs />} />
         <Route path="/submit-idea" element={<SubmitIdea />} />
       </Route>
 

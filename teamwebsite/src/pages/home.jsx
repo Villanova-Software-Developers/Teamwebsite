@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { Users, Target, Award, ChevronDown, Code, Share, Trophy, Rocket, ArrowRight } from 'lucide-react';
 import AnimatedTitle from '../components/animations/AnimatedTitle'; // Add this import
+import CustomCursor from '../components/animations/CustomCursor';
 
 
 const WhatWeDoCard = ({ icon: Icon, title, description, link, delay }) => {
@@ -101,13 +102,17 @@ const Home = () => {
 
   return (
     <div className="bg-gray-50">
+      <CustomCursor />
+      
       {/* Hero Section with Enhanced Background */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="relative min-h-screen bg-white"
       >
-        {/* Animated Background Pattern */}
+
+
+     {/* Animated Background Pattern */}
        {/* Modern Gradient Background */}
        <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -171,50 +176,58 @@ const Home = () => {
         ))}
 
         {/* Hero Content */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-screen flex flex-col justify-center">
-          <div className="text-center md:text-left md:w-3/5">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-6 inline-block px-4 py-2 bg-blue-100 rounded-full"
-            >
-              <span className="text-blue-600 font-semibold">Welcome to VSE</span>
-            </motion.div>
-            <AnimatedTitle />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
+  <div className="w-full md:w-3/5">
+    {/* Welcome Badge */}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="mb-6 inline-block px-4 py-2 bg-blue-100 rounded-full"
+    >
+      <span className="text-blue-600 font-semibold">Welcome to VSE</span>
+    </motion.div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="text-xl md:text-2xl text-gray-600 mb-8"
-            >
-              Where innovation meets collaboration. Join us in creating amazing projects
-              and building the future together.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="space-x-4"
-            >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-blue-700 transition-colors"
-              >
-                Join Us
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-gray-50 transition-colors border border-blue-200"
-              >
-                Learn More
-              </motion.button>
-            </motion.div>
-          </div>
-          
+    {/* Animated Title */}
+    <div className="animated-title-container mb-6">
+      <AnimatedTitle />
+    </div>
+
+    {/* Description */}
+    <motion.p
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6 }}
+      className="text-xl md:text-2xl text-gray-600 mb-8"
+    >
+      Where innovation meets collaboration. Join us in creating amazing projects
+      and building the future together.
+    </motion.p>
+
+    {/* Buttons */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8 }}
+      className="flex flex-wrap gap-4"
+    >
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-blue-700 transition-colors"
+      >
+        Join Us
+      </motion.button>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-gray-50 transition-colors border border-blue-200"
+      >
+        Learn More
+      </motion.button>
+    </motion.div>
+  </div>
+
           {/* Scroll Indicator */}
           <motion.div 
             className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
