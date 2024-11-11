@@ -1,63 +1,286 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Link } from 'react-router-dom';
-import { Users, Target, Award, ChevronDown, Code, Share, Trophy, Rocket, ArrowRight } from 'lucide-react';
-import AnimatedTitle from '../components/animations/AnimatedTitle'; // Add this import
+import { 
+  Users, 
+  Target, 
+  Award, 
+  ChevronDown, 
+  Code, 
+  Share, 
+  Trophy, 
+  Rocket, 
+  ArrowRight,
+  X  // Added X icon
+} from 'lucide-react';
+import AnimatedTitle from '../components/animations/AnimatedTitle';
 import CustomCursor from '../components/animations/CustomCursor';
 
 
-const WhatWeDoCard = ({ icon: Icon, title, description, link, delay }) => {
+const WhatWeDoCard = ({ icon: Icon, title, description, delay }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const modalContent = {
+    title,
+    description,
+    features: [
+      {
+        title: 'Learn Together',
+        description: 'Join our community workshops and coding sessions.'
+      },
+      {
+        title: 'Build Projects',
+        description: 'Work on real-world projects with other members.'
+      },
+      {
+        title: 'Grow Skills',
+        description: 'Develop your technical and soft skills through hands-on experience.'
+      },
+      {
+        title: 'Network',
+        description: 'Connect with industry professionals and fellow developers.'
+      }
+    ]
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className="relative group"
-    >
-      <Link to={link}>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white p-8 rounded-2xl shadow-lg overflow-hidden relative z-10"
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay }}
+        className="relative group"
+      >
+        <div
+          onClick={() => setIsModalOpen(true)}
+          className="cursor-pointer"
         >
-          {/* Background gradient that appears on hover */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          
-          {/* Content */}
-          <div className="relative z-10">
-            <div className="mb-4 flex justify-between items-center">
-              <div className="p-3 bg-blue-100 rounded-lg w-14 h-14 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <Icon className="w-8 h-8 text-blue-600" />
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-white p-8 rounded-2xl shadow-lg overflow-hidden relative z-10"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative z-10">
+              <div className="mb-4 flex justify-between items-center">
+                <div className="p-3 bg-blue-100 rounded-lg w-14 h-14 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                  <Icon className="w-8 h-8 text-blue-600" />
+                </div>
+                <motion.div
+                  initial={{ x: -10, opacity: 0 }}
+                  whileHover={{ x: 0, opacity: 1 }}
+                  className="text-blue-600"
+                >
+                  <ArrowRight className="w-6 h-6" />
+                </motion.div>
               </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                {title}
+              </h3>
+              <p className="text-gray-600">
+                {description}
+              </p>
+              
               <motion.div
-                initial={{ x: -10, opacity: 0 }}
-                whileHover={{ x: 0, opacity: 1 }}
-                className="text-blue-600"
-              >
-                <ArrowRight className="w-6 h-6" />
-              </motion.div>
+                className="absolute bottom-0 left-0 h-1 bg-blue-500"
+                initial={{ width: 0 }}
+                whileHover={{ width: '100%' }}
+                transition={{ duration: 0.3 }}
+              />
             </div>
-            
-            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-              {title}
-            </h3>
-            <p className="text-gray-600">
-              {description}
-            </p>
-            
-            {/* Animated line */}
-            <motion.div
-              className="absolute bottom-0 left-0 h-1 bg-blue-500"
-              initial={{ width: 0 }}
-              whileHover={{ width: '100%' }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        </motion.div>
-      </Link>
-    </motion.div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      <ImmersiveModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        content={modalContent}
+      />
+    </>
   );
 };
+
+
+
+
+// Letter animation component for text popping effect
+const AnimatedLetter = ({ letter, delay }) => (
+  <motion.span
+    initial={{ opacity: 0, scale: 0.5 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{
+      duration: 0.5,
+      delay,
+      type: "spring",
+      stiffness: 200,
+      damping: 10
+    }}
+    className="inline-block"
+  >
+    {letter}
+  </motion.span>
+);
+
+// Animated heading with letter-by-letter animation
+const AnimatedHeading = ({ text, startDelay = 0 }) => (
+  <h2 className="text-6xl font-bold text-white tracking-wider font-tech">
+    {text.split('').map((letter, index) => (
+      <AnimatedLetter
+        key={index}
+        letter={letter}
+        delay={startDelay + index * 0.05}
+      />
+    ))}
+  </h2>
+);
+
+const AnimatedText = ({ children, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ 
+      duration: 0.6, 
+      delay,
+      ease: [0.22, 1, 0.36, 1]
+    }}
+    className="font-tech"
+  >
+    {children}
+  </motion.div>
+);
+
+const ImmersiveModal = ({ isOpen, onClose, content }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50"
+      >
+        {/* Video Background with Wave Effect */}
+        <div className="absolute inset-0 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="code3.mp4" type="video/mp4" />
+          </video>
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 via-purple-900/80 to-blue-900/90" />
+          
+          {/* Animated Wave Pattern */}
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'url("/wave-pattern.svg")',
+              backgroundSize: 'cover',
+              opacity: 0.1
+            }}
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.1, 0.15, 0.1],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+
+        {/* Content Container */}
+        <div className="relative h-full flex items-center justify-center px-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="w-full max-w-4xl"
+          >
+            {/* Close Button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              onClick={onClose}
+              className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </motion.button>
+
+            {/* Content with Enhanced Typography and Animations */}
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <AnimatedHeading text={content.title} startDelay={0.2} />
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: 0.8, duration: 0.8 }}
+                  className="h-1 bg-white"
+                />
+              </div>
+
+              <AnimatedText delay={0.6}>
+                <p className="text-2xl text-white/90 tracking-wide leading-relaxed">
+                  {content.description}
+                </p>
+              </AnimatedText>
+
+              {/* Features Grid with Enhanced Typography */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+                {content.features?.map((feature, index) => (
+                  <AnimatedText key={index} delay={0.8 + index * 0.1}>
+                    <motion.div
+                      whileHover={{ 
+                        scale: 1.02,
+                        boxShadow: "0 0 20px rgba(59, 130, 246, 0.3)"
+                      }}
+                      className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/10 transition-all"
+                    >
+                      <h3 className="text-2xl font-bold text-white mb-2 tracking-wider">
+                        {feature.title}
+                      </h3>
+                      <p className="text-lg text-white/80 tracking-wide">
+                        {feature.description}
+                      </p>
+                    </motion.div>
+                  </AnimatedText>
+                ))}
+              </div>
+
+              {/* Call to Action */}
+              <AnimatedText delay={1.2}>
+                <motion.div className="flex justify-center mt-12">
+                  <motion.button
+                   whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: "0 0 30px rgba(34, 211, 238, 0.5)" // Updated to cyan color
+                  }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-cyan-400 hover:bg-cyan-500 text-white px-10 py-4 rounded-lg text-xl font-bold tracking-wider transition-all shadow-lg"
+                  >
+                    GET STARTED →
+                  </motion.button>
+                </motion.div>
+              </AnimatedText>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+
+
 const whatWeDoItems = [
   {
     icon: Code,

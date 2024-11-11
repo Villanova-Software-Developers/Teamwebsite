@@ -27,5 +27,12 @@
   .text-element {
     line-height: 1em; /* or match it to the font-size, e.g., 20px if the font-size is 20px */
   }
+
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+  .font-tech {
+    font-family: 'Orbitron', sans-serif;
+  }
+  
   
   
