@@ -198,103 +198,103 @@ const TeamManagement = () => {
                 />
               </div>
 
-              // ... (previous code remains the same until the LinkedIn input)
+             // ... (previous code remains the same until the LinkedIn input)
 
-<div>
-  <label className="block text-sm font-medium text-gray-700">
-    LinkedIn URL
-  </label>
-  <input
-    type="url"
-    value={formData.linkedin}
-    onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-  />
-</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  LinkedIn URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.linkedin}
+                  onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
 
-<div>
-  <label className="block text-sm font-medium text-gray-700">
-    Email
-  </label>
-  <input
-    type="email"
-    value={formData.email}
-    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-  />
-</div>
-</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
 
-<div className="flex justify-end space-x-3">
-<button
-  type="button"
-  onClick={() => setIsAddingMember(false)}
-  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
->
-  Cancel
-</button>
-<button
-  type="submit"
-  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
->
-  Add Member
-</button>
-</div>
-</form>
-</motion.div>
-)}
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setIsAddingMember(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Add Member
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      )}
 
-{/* Team Members Grid */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-{members.map((member) => (
-<motion.div
-key={member.id}
-initial={{ opacity: 0, y: 20 }}
-animate={{ opacity: 1, y: 0 }}
-className="bg-white rounded-xl shadow-lg overflow-hidden"
->
-<div className="p-6">
-<div className="flex justify-end space-x-2 mb-4">
-  <button
-    onClick={() => handleDelete(member.id)}
-    className="p-1 text-red-500 hover:bg-red-50 rounded"
-  >
-    <Trash className="w-4 h-4" />
-  </button>
-</div>
-<div className="text-center">
-  <img
-    src={member.image || "/api/placeholder/150/150"}
-    alt={member.name}
-    className="w-32 h-32 object-cover rounded-full mx-auto mb-4"
-  />
-  <h3 className="text-lg font-semibold">{member.name}</h3>
-  <p className="text-blue-600">{member.role}</p>
-  <p className="text-gray-600 mt-2">{member.about}</p>
-  <div className="flex justify-center space-x-3 mt-4">
-    {member.github && (
-      <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
-        <GithubIcon className="w-5 h-5" />
-      </a>
-    )}
-    {member.linkedin && (
-      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
-        <LinkedinIcon className="w-5 h-5" />
-      </a>
-    )}
-    {member.email && (
-      <a href={`mailto:${member.email}`} className="text-gray-600 hover:text-blue-600">
-        <MailIcon className="w-5 h-5" />
-      </a>
-    )}
-  </div>
-</div>
-</div>
-</motion.div>
-))}
-</div>
-</div>
-);
+      {/* Team Members Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {members.map((member) => (
+          <motion.div
+            key={member.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-lg overflow-hidden"
+          >
+            <div className="p-6">
+              <div className="flex justify-end space-x-2 mb-4">
+                <button
+                  onClick={() => handleDelete(member.id)}
+                  className="p-1 text-red-500 hover:bg-red-50 rounded"
+                >
+                  <Trash className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="text-center">
+                <img
+                  src={member.image || "/api/placeholder/150/150"}
+                  alt={member.name}
+                  className="w-32 h-32 object-cover rounded-full mx-auto mb-4"
+                />
+                <h3 className="text-lg font-semibold">{member.name}</h3>
+                <p className="text-blue-600">{member.role}</p>
+                <p className="text-gray-600 mt-2">{member.about}</p>
+                <div className="flex justify-center space-x-3 mt-4">
+                  {member.github && (
+                    <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
+                      <GithubIcon className="w-5 h-5" />
+                    </a>
+                  )}
+                  {member.linkedin && (
+                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
+                      <LinkedinIcon className="w-5 h-5" />
+                    </a>
+                  )}
+                  {member.email && (
+                    <a href={`mailto:${member.email}`} className="text-gray-600 hover:text-blue-600">
+                      <MailIcon className="w-5 h-5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default TeamManagement;

@@ -9,17 +9,15 @@ import Login from './pages/auth/Login';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-
-  const { isAuthenticated } = useAuth();
+  // Comment out or remove the authentication check for now
+  // const { isAuthenticated } = useAuth();
   
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/admin/login" replace />;
+  // }
   
   return children;
-
 };
-
 function App() {
   return (
     <Routes>
