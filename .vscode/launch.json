@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/swopnilpanday/Teamwebsite/sdc-website/src/components/layout",
+      "program": "/Users/swopnilpanday/Teamwebsite/sdc-website/src/components/layout/build/Debug/outDebug"
+    }
+  ]
+}

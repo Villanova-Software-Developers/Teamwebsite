@@ -1,0 +1,5 @@
+djangorestframework
+django-cors-headers
+Pillow
+firebase-admin
+python-dotenv
