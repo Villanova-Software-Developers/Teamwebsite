@@ -4,6 +4,9 @@ import {
   Plus, X, Upload, GithubIcon, 
   LinkedinIcon, MailIcon, Edit, Trash 
 } from 'lucide-react';
+import { db, storage } from '../../contexts/AuthContext';
+import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const TeamManagement = () => {
   const [members, setMembers] = useState([]);
@@ -18,25 +21,35 @@ const TeamManagement = () => {
     email: ''
   });
   const [previewImage, setPreviewImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch team members from your API
     fetchMembers();
   }, []);
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch('/api/team/');
-      const data = await response.json();
-      setMembers(data);
+      const querySnapshot = await getDocs(collection(db, 'members'));
+      const membersData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setMembers(membersData);
     } catch (error) {
       console.error('Error fetching members:', error);
+      setError('Failed to load team members');
     }
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (e.g., max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size must be less than 5MB');
+        return;
+      }
       setFormData({ ...formData, image: file });
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -44,48 +57,63 @@ const TeamManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (formData[key] !== null) {
-        formDataToSend.append(key, formData[key]);
-      }
-    });
-
     try {
-      const response = await fetch('/api/team/', {
-        method: 'POST',
-        body: formDataToSend,
+      let imageUrl = null;
+      
+      // Upload image if one is selected
+      if (formData.image) {
+        const imageRef = ref(storage, `member_images/${Date.now()}_${formData.image.name}`);
+        await uploadBytes(imageRef, formData.image);
+        imageUrl = await getDownloadURL(imageRef);
+      }
+
+      // Add member to Firestore
+      await addDoc(collection(db, 'members'), {
+        name: formData.name,
+        role: formData.role,
+        about: formData.about,
+        image: imageUrl,
+        github: formData.github,
+        linkedin: formData.linkedin,
+        email: formData.email,
+        createdAt: new Date(),
+        isActive: true
       });
 
-      if (response.ok) {
-        setIsAddingMember(false);
-        setFormData({
-          name: '',
-          role: 'MEMBER',
-          about: '',
-          image: null,
-          github: '',
-          linkedin: '',
-          email: ''
-        });
-        setPreviewImage(null);
-        fetchMembers();
-      }
+      // Reset form
+      setIsAddingMember(false);
+      setFormData({
+        name: '',
+        role: 'MEMBER',
+        about: '',
+        image: null,
+        github: '',
+        linkedin: '',
+        email: ''
+      });
+      setPreviewImage(null);
+      
+      // Refresh members list
+      fetchMembers();
     } catch (error) {
       console.error('Error adding member:', error);
+      setError('Failed to add team member');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this member?')) {
       try {
-        await fetch(`/api/team/${id}/`, {
-          method: 'DELETE',
-        });
+        await deleteDoc(doc(db, 'members', id));
         fetchMembers();
       } catch (error) {
         console.error('Error deleting member:', error);
+        setError('Failed to delete team member');
       }
     }
   };
@@ -234,11 +262,15 @@ const TeamManagement = () => {
                 Cancel
               </button>
               <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              >
-                Add Member
-              </button>
+        type="submit"
+        disabled={loading}
+        className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 ${
+          loading ? 'opacity-75 cursor-not-allowed' : ''
+        }`}
+      >
+        {loading ? 'Adding Member...' : 'Add Member'}
+      </button>
+      
             </div>
           </form>
         </motion.div>

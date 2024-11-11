@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Upload, CheckCircle } from 'lucide-react';
+import { storage, db } from '../contexts/AuthContext';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const SubmitIdea = () => {
   const [formState, setFormState] = useState({
@@ -12,26 +15,52 @@ const SubmitIdea = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormState({
-        name: '',
-        email: '',
-        projectTitle: '',
-        description: '',
-        file: null,
+    setError('');
+
+    try {
+      // Upload file to Firebase Storage if one is selected
+      let fileUrl = null;
+      if (formState.file) {
+        const fileRef = ref(storage, `project_docs/${Date.now()}_${formState.file.name}`);
+        await uploadBytes(fileRef, formState.file);
+        fileUrl = await getDownloadURL(fileRef);
+      }
+
+      // Add document to Firestore
+      await addDoc(collection(db, 'projectIdeas'), {
+        name: formState.name,
+        email: formState.email,
+        projectTitle: formState.projectTitle,
+        description: formState.description,
+        documentUrl: fileUrl,
+        status: 'NEW',
+        createdAt: serverTimestamp(),
       });
-    }, 3000);
+
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormState({
+          name: '',
+          email: '',
+          projectTitle: '',
+          description: '',
+          file: null,
+        });
+      }, 3000);
+    } catch (error) {
+      setError('Error submitting form. Please try again.');
+      setIsSubmitting(false);
+      console.error('Submission error:', error);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -43,6 +72,7 @@ const SubmitIdea = () => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

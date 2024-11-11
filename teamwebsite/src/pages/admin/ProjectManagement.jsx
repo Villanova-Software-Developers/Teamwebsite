@@ -5,6 +5,8 @@ import {
   ExternalLink, Download, Check, 
   X, AlertCircle 
 } from 'lucide-react';
+import { db } from '../../contexts/AuthContext';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 
 const StatusBadge = ({ status }) => {
   const getStatusColor = () => {
@@ -24,7 +26,7 @@ const StatusBadge = ({ status }) => {
 
   return (
     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor()}`}>
-      {status}
+      {status || 'NEW'}
     </span>
   );
 };
@@ -34,6 +36,8 @@ const ProjectManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -41,27 +45,30 @@ const ProjectManagement = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects/');
-      const data = await response.json();
-      setProjects(data);
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, 'projectIdeas'));
+      const projectsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate().toLocaleString() || 'N/A'
+      }));
+      setProjects(projectsData);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching projects:', error);
+      setError('Failed to load projects');
+      setLoading(false);
     }
   };
 
   const handleStatusChange = async (projectId, newStatus) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus })
+      const projectRef = doc(db, 'projectIdeas', projectId);
+      await updateDoc(projectRef, {
+        status: newStatus,
+        updatedAt: new Date()
       });
-
-      if (response.ok) {
-        fetchProjects();
-      }
+      await fetchProjects(); // Refresh the list
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -69,11 +76,27 @@ const ProjectManagement = () => {
 
   const filteredProjects = projects.filter(project => {
     const matchesSearch = 
-      project.project_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.name.toLowerCase().includes(searchTerm.toLowerCase());
+      project.projectTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg text-gray-600">Loading projects...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -113,25 +136,28 @@ const ProjectManagement = () => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
                 <div>
                   <div className="flex items-center space-x-3">
-                    <h3 className="text-lg font-semibold">{project.project_title}</h3>
+                    <h3 className="text-lg font-semibold">{project.projectTitle || 'Untitled Project'}</h3>
                     <StatusBadge status={project.status} />
                   </div>
                   <p className="text-gray-600 mt-1">By {project.name}</p>
                   <p className="text-gray-500 text-sm mt-1">{project.email}</p>
+                  <p className="text-gray-500 text-sm mt-1">Submitted: {project.createdAt}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setSelectedProject(project)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                    title="View Details"
                   >
                     <FileText className="w-5 h-5" />
                   </button>
-                  {project.document && (
+                  {project.documentUrl && (
                     <a
-                      href={project.document}
+                      href={project.documentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                      title="Download Document"
                     >
                       <Download className="w-5 h-5" />
                     </a>
@@ -139,18 +165,21 @@ const ProjectManagement = () => {
                   <button
                     onClick={() => handleStatusChange(project.id, 'REVIEWING')}
                     className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg"
+                    title="Mark as Reviewing"
                   >
                     <AlertCircle className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleStatusChange(project.id, 'ACCEPTED')}
                     className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                    title="Accept Project"
                   >
                     <Check className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleStatusChange(project.id, 'REJECTED')}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    title="Reject Project"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -163,7 +192,7 @@ const ProjectManagement = () => {
 
       {/* Project Details Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -172,7 +201,7 @@ const ProjectManagement = () => {
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold">{selectedProject.project_title}</h3>
+                  <h3 className="text-xl font-semibold">{selectedProject.projectTitle}</h3>
                   <p className="text-gray-600">Submitted by {selectedProject.name}</p>
                 </div>
                 <button
@@ -194,11 +223,11 @@ const ProjectManagement = () => {
                   <p className="mt-1 text-gray-600">{selectedProject.email}</p>
                 </div>
 
-                {selectedProject.document && (
+                {selectedProject.documentUrl && (
                   <div>
                     <h4 className="text-sm font-medium text-gray-700">Attached Document</h4>
                     <a
-                      href={selectedProject.document}
+                      href={selectedProject.documentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-1 inline-flex items-center text-blue-600 hover:text-blue-700"
@@ -208,6 +237,11 @@ const ProjectManagement = () => {
                     </a>
                   </div>
                 )}
+
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700">Submission Date</h4>
+                  <p className="mt-1 text-gray-600">{selectedProject.createdAt}</p>
+                </div>
 
                 <div>
                   <h4 className="text-sm font-medium text-gray-700">Status</h4>

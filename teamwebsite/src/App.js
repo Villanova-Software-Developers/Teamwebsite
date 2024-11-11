@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/layout/AdminLayout';
@@ -6,18 +5,19 @@ import { Home, Members, Projects, Faq, Team, SubmitIdea } from './pages';
 import { AdminDashboard, TeamManagement, ProjectManagement } from './pages/admin';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/auth/Login';
+import Register from './pages/auth/Register'; // Add this import
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  // Comment out or remove the authentication check for now
-  // const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/admin/login" replace />;
-  // }
+  if (!user) {
+    return <Navigate to="/admin/login" replace />;
+  }
   
   return children;
 };
+
 function App() {
   return (
     <Routes>
@@ -31,8 +31,8 @@ function App() {
       </Route>
 
       {/* Admin Routes */}
-      /*
       <Route path="/admin/login" element={<Login />} />
+      <Route path="/admin/register" element={<Register />} /> {/* Add this route */}
       <Route path="/admin" element={
         <ProtectedRoute>
           <AdminLayout />

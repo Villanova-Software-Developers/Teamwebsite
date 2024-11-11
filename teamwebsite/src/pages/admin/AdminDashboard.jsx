@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, FileText, TrendingUp, 
-  BarChart2, Calendar, ChevronRight 
+  BarChart2, Calendar, ChevronRight,
+  UserPlus, // Added this
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, 
@@ -10,6 +11,7 @@ import {
 } from 'recharts';
 import TeamManagement from './TeamManagement';
 import ProjectManagement from './ProjectManagement';
+import { useNavigate } from 'react-router-dom';
 
 const StatCard = ({ title, value, icon: Icon, trend }) => (
   <motion.div
@@ -35,11 +37,14 @@ const StatCard = ({ title, value, icon: Icon, trend }) => (
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const navigate = useNavigate(); // Add this
   const [analyticsData, setAnalyticsData] = useState({
     projectSubmissions: [],
     joinRequests: [],
     trafficData: []
   });
+
+
 
   useEffect(() => {
     // Fetch analytics data from your backend
@@ -84,10 +89,21 @@ const AdminDashboard = () => {
       trend: 15.3
     }
   ];
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header with Register Button */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <button
+            onClick={() => navigate('/admin/register')}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <UserPlus className="w-5 h-5 mr-2" />
+            Register New Admin
+          </button>
+        </div>
+
         {/* Navigation Tabs */}
         <div className="flex space-x-4 mb-8">
           <button
