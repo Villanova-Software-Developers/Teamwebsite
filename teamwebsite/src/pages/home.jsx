@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 import { Users, Target, Award, ChevronDown, Code, Share, Trophy, Rocket, ArrowRight } from 'lucide-react';
+import AnimatedTitle from '../components/animations/AnimatedTitle'; // Add this import
+
 
 const WhatWeDoCard = ({ icon: Icon, title, description, link, delay }) => {
   return (
@@ -179,14 +181,8 @@ const Home = () => {
             >
               <span className="text-blue-600 font-semibold">Welcome to VSE</span>
             </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight"
-            >
-              Villanova Software Engineers
-            </motion.h1>
+            <AnimatedTitle />
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
