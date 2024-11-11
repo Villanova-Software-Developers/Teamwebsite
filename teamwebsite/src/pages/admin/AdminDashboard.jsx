@@ -11,6 +11,9 @@ import {
 } from 'recharts';
 import TeamManagement from './TeamManagement';
 import ProjectManagement from './ProjectManagement';
+import MessagesManagement from './MessagesManagement';
+import JoinRequestsManagement from './JoinRequestsManagement';
+
 import { useNavigate } from 'react-router-dom';
 
 const StatCard = ({ title, value, icon: Icon, trend }) => (
@@ -106,37 +109,59 @@ const AdminDashboard = () => {
 
         {/* Navigation Tabs */}
         <div className="flex space-x-4 mb-8">
-          <button
-            onClick={() => setActiveTab('dashboard')}
+  <button
+    onClick={() => setActiveTab('dashboard')}
+    className={`px-4 py-2 rounded-lg ${
+      activeTab === 'dashboard' 
+        ? 'bg-blue-500 text-white' 
+        : 'bg-white text-gray-600'
+    }`}
+  >
+    Dashboard
+  </button>
+  <button
+    onClick={() => setActiveTab('team')}
+    className={`px-4 py-2 rounded-lg ${
+      activeTab === 'team' 
+        ? 'bg-blue-500 text-white' 
+        : 'bg-white text-gray-600'
+    }`}
+  >
+    Team Management
+  </button>
+  <button
+    onClick={() => setActiveTab('projects')}
+    className={`px-4 py-2 rounded-lg ${
+      activeTab === 'projects' 
+        ? 'bg-blue-500 text-white' 
+        : 'bg-white text-gray-600'
+    }`}
+  >
+    Project Ideas
+  </button>
+  <button
+    onClick={() => setActiveTab('join-requests')}
+    className={`px-4 py-2 rounded-lg ${
+      activeTab === 'join-requests' 
+        ? 'bg-blue-500 text-white' 
+        : 'bg-white text-gray-600'
+    }`}
+  >
+    Join Requests
+  </button>
+  <button
+            onClick={() => setActiveTab('messages')}
             className={`px-4 py-2 rounded-lg ${
-              activeTab === 'dashboard' 
+              activeTab === 'messages' 
                 ? 'bg-blue-500 text-white' 
                 : 'bg-white text-gray-600'
             }`}
           >
-            Dashboard
+            Messages
           </button>
-          <button
-            onClick={() => setActiveTab('team')}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === 'team' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-white text-gray-600'
-            }`}
-          >
-            Team Management
-          </button>
-          <button
-            onClick={() => setActiveTab('projects')}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === 'projects' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-white text-gray-600'
-            }`}
-          >
-            Project Ideas
-          </button>
-        </div>
+</div>
+
+
 
         {activeTab === 'dashboard' && (
           <div className="space-y-8">
@@ -213,8 +238,10 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'team' && <TeamManagement />}
-        {activeTab === 'projects' && <ProjectManagement />}
+{activeTab === 'team' && <TeamManagement />}
+{activeTab === 'projects' && <ProjectManagement />}
+{activeTab === 'join-requests' && <JoinRequestsManagement />}
+{activeTab === 'messages' && <MessagesManagement />}
       </div>
     </div>
   );

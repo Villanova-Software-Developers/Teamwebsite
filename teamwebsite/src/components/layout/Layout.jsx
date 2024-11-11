@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
+
 const Layout = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -11,6 +12,7 @@ const Layout = () => {
     { path: '/projects', label: 'Projects' },
     { path: '/members', label: 'Members' },
     { path: '/submit-idea', label: 'Submit an Idea' },
+    { path: '/join-us', label: 'Join Us' },  // Added this line
     { path: '/faq', label: 'FAQ & Contact' },
   ];
 

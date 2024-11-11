@@ -3,9 +3,10 @@ import Layout from './components/layout/Layout';
 import AdminLayout from './components/layout/AdminLayout';
 import { Home, Members, Projects, Faq, Team, SubmitIdea } from './pages';
 import { AdminDashboard, TeamManagement, ProjectManagement } from './pages/admin';
+import JoinRequestsManagement from './pages/admin/JoinRequestsManagement';
 import { useAuth } from './contexts/AuthContext';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register'; // Add this import
+import Login from './pages/auth//Login';
+import Register from './pages/auth/Register';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -32,15 +33,26 @@ function App() {
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<Login />} />
-      <Route path="/admin/register" element={<Register />} /> {/* Add this route */}
-      <Route path="/admin" element={
-        <ProtectedRoute>
-          <AdminLayout />
-        </ProtectedRoute>
-      }>
+      <Route
+        path="/admin/register"
+        element={
+          <ProtectedRoute>
+            <Register />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<AdminDashboard />} />
         <Route path="team" element={<TeamManagement />} />
         <Route path="projects" element={<ProjectManagement />} />
+        <Route path="join-requests" element={<JoinRequestsManagement />} />
       </Route>
     </Routes>
   );
