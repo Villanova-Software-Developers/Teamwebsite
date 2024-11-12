@@ -59,9 +59,8 @@ const WordContainer = ({ children, word }) => {
           dominantBaseline="middle"
           textAnchor="middle"
           className="text-4xl sm:text-6xl md:text-8xl font-bold"
-
-          fill={isHovered ? '#1a2b66' : 'white'} // Navy blue fill on hover
-          stroke={isHovered ? '#1a2b66' : 'black'} // Black stroke initially, navy on hover
+          fill={isHovered ? '#1a2b66' : 'white'}
+          stroke={isHovered ? '#1a2b66' : 'black'}
           strokeWidth="1"
           style={{
             transition: 'fill 0.3s ease, stroke 0.3s ease',
@@ -106,8 +105,50 @@ const AnimatedTitle = () => {
   return (
     <div className="relative">
       <CustomCursor allWordsTyped={allWordsTyped} />
-      <div className="animated-title-container relative z-10">
-        <div className="flex flex-col gap-6">
+      <div className="animated-title-container relative z-10 pl-2 sm:pl-0">
+        {/* Mobile Layout */}
+        <div className="flex flex-col items-start sm:hidden">
+          <div className="flex flex-col gap-2">
+            <div className="h-12 flex items-start">
+              <WordContainer word="Villanova">
+                {activeWordIndex === 0 ? (
+                  <TypeWriter text={words[0]} onComplete={handleWordComplete} />
+                ) : (
+                  <span className="text-outline">
+                    {completedWords.has(0) ? words[0] : ''}
+                  </span>
+                )}
+              </WordContainer>
+            </div>
+            
+            <div className="h-12 flex items-start">
+              <WordContainer word="Software">
+                {activeWordIndex === 1 ? (
+                  <TypeWriter text={words[1]} onComplete={handleWordComplete} />
+                ) : (
+                  <span className="text-outline">
+                    {completedWords.has(1) ? words[1] : ''}
+                  </span>
+                )}
+              </WordContainer>
+            </div>
+
+            <div className="h-12 flex items-start">
+              <WordContainer word="Engineers">
+                {activeWordIndex === 2 ? (
+                  <TypeWriter text={words[2]} onComplete={handleWordComplete} />
+                ) : (
+                  <span className="text-outline">
+                    {completedWords.has(2) ? words[2] : ''}
+                  </span>
+                )}
+              </WordContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout (Original) */}
+        <div className="hidden sm:flex sm:flex-col sm:gap-6">
           <div className="flex gap-8 items-center h-24">
             <WordContainer word="Villanova">
               {activeWordIndex === 0 ? (
