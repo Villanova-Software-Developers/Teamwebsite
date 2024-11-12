@@ -1,45 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { ArrowRight, Clock, Star } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../contexts/AuthContext';
 
 const Projects = () => {
   const [activeTab, setActiveTab] = useState('current');
+  const [projects, setProjects] = useState({ current: [], past: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
 
-  const projects = {
-    current: [
-      {
-        title: 'Project Alpha',
-        description: 'An innovative solution for modern problems',
-        status: 'In Progress',
-        completion: 75,
-      },
-      {
-        title: 'Project Beta',
-        description: 'Revolutionizing the way we think',
-        status: 'Planning',
-        completion: 25,
-      },
-    ],
-    past: [
-      {
-        title: 'Project Legacy',
-        description: 'Award-winning innovation',
-        status: 'Completed',
-        completion: 100,
-      },
-      {
-        title: 'Project Phoenix',
-        description: 'Breakthrough in technology',
-        status: 'Completed',
-        completion: 100,
-      },
-    ],
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'projects'));
+      const projectsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Separate projects into current and past
+      const categorizedProjects = {
+        current: projectsData.filter(project => project.status === 'current'),
+        past: projectsData.filter(project => project.status === 'past')
+      };
+
+      setProjects(categorizedProjects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setError('Failed to load projects');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-gray-600">Loading projects...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -77,13 +94,22 @@ const Projects = () => {
           <AnimatePresence mode="wait">
             {projects[activeTab].map((project, index) => (
               <motion.div
-                key={project.title}
+                key={project.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ delay: index * 0.2 }}
                 className="bg-white rounded-xl shadow-lg overflow-hidden"
               >
+                {project.image && (
+                  <div className="w-full h-48">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-gray-900">
@@ -91,15 +117,15 @@ const Projects = () => {
                     </h3>
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
-                        project.status === 'Completed'
+                        project.status === 'past'
                           ? 'bg-green-100 text-green-800'
                           : 'bg-blue-100 text-blue-800'
                       }`}
                     >
-                      {project.status}
+                      {project.status === 'current' ? 'In Progress' : 'Completed'}
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-4">{project.description}</p>
+                  <p className="text-gray-600 mb-4">{project.about}</p>
                   
                   {/* Progress Bar */}
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
@@ -111,12 +137,17 @@ const Projects = () => {
                     />
                   </div>
 
-                  <motion.button
-                    whileHover={{ x: 5 }}
-                    className="flex items-center text-blue-500 hover:text-blue-600"
-                  >
-                    Learn More <ArrowRight className="ml-2 w-4 h-4" />
-                  </motion.button>
+                  {project.learnMoreLink && (
+                    <motion.a
+                      href={project.learnMoreLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ x: 5 }}
+                      className="flex items-center text-blue-500 hover:text-blue-600"
+                    >
+                      Learn More <ArrowRight className="ml-2 w-4 h-4" />
+                    </motion.a>
+                  )}
                 </div>
               </motion.div>
             ))}

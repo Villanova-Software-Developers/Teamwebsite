@@ -7,7 +7,7 @@ import {
   LogOut 
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-
+import ProjectManager from '../../pages/admin/ProjectManager';
 const AdminLayout = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ const AdminLayout = () => {
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/admin/team', icon: Users, label: 'Team' },
     { path: '/admin/projects', icon: FileText, label: 'Projects' },
+    { path: '/admin/project-manager', icon: FileText, label: 'projectmanager' },
   ];
 
   return (

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { GithubIcon, LinkedinIcon, MailIcon } from 'lucide-react';
 import { db } from '../contexts/AuthContext';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
-// SocialLink component remains the same
+// SocialLink component remains unchanged
 const SocialLink = ({ icon: Icon, href }) => (
   <motion.a
     href={href}
@@ -18,7 +18,7 @@ const SocialLink = ({ icon: Icon, href }) => (
   </motion.a>
 );
 
-// LeadershipCard and Member components remain the same
+// LeadershipCard and Member components remain unchanged
 const LeadershipCard = ({ name, role, image, about, github, linkedin, email }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -92,9 +92,14 @@ const Team = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Set up real-time listener for team members
-    const unsubscribe = onSnapshot(
+    // Create a query that orders by role (to separate leadership) and then by the order field
+    const membersQuery = query(
       collection(db, 'members'),
+      orderBy('order', 'asc') // This will use the order field set in admin
+    );
+
+    const unsubscribe = onSnapshot(
+      membersQuery,
       (snapshot) => {
         const leadershipArray = [];
         const membersArray = [];
@@ -105,7 +110,7 @@ const Team = () => {
             ...doc.data()
           };
           
-          // Sort members based on role
+          // Still separate by role, but maintain order within each group
           if (member.role === 'CO_PRES') {
             leadershipArray.push(member);
           } else {
@@ -113,9 +118,19 @@ const Team = () => {
           }
         });
 
-        // Sort arrays by name if needed
-        leadershipArray.sort((a, b) => a.name.localeCompare(b.name));
-        membersArray.sort((a, b) => a.name.localeCompare(b.name));
+        // If order is not set for some reason, use name as fallback
+        const sortByOrderOrName = (a, b) => {
+          if (a.order === b.order || (a.order === undefined && b.order === undefined)) {
+            return a.name.localeCompare(b.name);
+          }
+          if (a.order === undefined) return 1;
+          if (b.order === undefined) return -1;
+          return a.order - b.order;
+        };
+
+        // Sort arrays by order field, fall back to name if order is not set
+        leadershipArray.sort(sortByOrderOrName);
+        membersArray.sort(sortByOrderOrName);
 
         setLeadership(leadershipArray);
         setMembers(membersArray);
@@ -128,7 +143,6 @@ const Team = () => {
       }
     );
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 

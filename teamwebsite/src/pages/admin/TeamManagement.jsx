@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Plus, X, Upload, GithubIcon, 
-  LinkedinIcon, MailIcon, Edit, Trash 
+  LinkedinIcon, MailIcon, Edit, Trash, GripVertical 
 } from 'lucide-react';
 import { db, storage } from '../../contexts/AuthContext';
-import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const TeamManagement = () => {
   const [members, setMembers] = useState([]);
   const [isAddingMember, setIsAddingMember] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [draggedItem, setDraggedItem] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     role: 'MEMBER',
@@ -18,7 +20,8 @@ const TeamManagement = () => {
     image: null,
     github: '',
     linkedin: '',
-    email: ''
+    email: '',
+    order: 0
   });
   const [previewImage, setPreviewImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,12 +36,102 @@ const TeamManagement = () => {
       const querySnapshot = await getDocs(collection(db, 'members'));
       const membersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        order: doc.data().order || 0
       }));
-      setMembers(membersData);
+      setMembers(membersData.sort((a, b) => a.order - b.order));
     } catch (error) {
       console.error('Error fetching members:', error);
       setError('Failed to load team members');
+    }
+  };
+
+  const handleDragStart = (e, member) => {
+    setDraggedItem(member);
+    e.currentTarget.classList.add('opacity-50');
+  };
+
+  const handleDragEnd = (e) => {
+    e.currentTarget.classList.remove('opacity-50');
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e, targetMember) => {
+    e.preventDefault();
+    
+    if (!draggedItem || draggedItem.id === targetMember.id) return;
+
+    const newMembers = [...members];
+    const draggedIndex = members.findIndex(m => m.id === draggedItem.id);
+    const targetIndex = members.findIndex(m => m.id === targetMember.id);
+
+    // Swap positions
+    newMembers[draggedIndex] = { ...newMembers[draggedIndex], order: targetIndex };
+    newMembers[targetIndex] = { ...newMembers[targetIndex], order: draggedIndex };
+
+    // Update state and Firestore
+    setMembers(newMembers.sort((a, b) => a.order - b.order));
+
+    try {
+      await Promise.all([
+        updateDoc(doc(db, 'members', draggedItem.id), { order: targetIndex }),
+        updateDoc(doc(db, 'members', targetMember.id), { order: draggedIndex })
+      ]);
+    } catch (error) {
+      console.error('Error updating order:', error);
+      setError('Failed to update member order');
+    }
+  };
+
+  const handleEdit = (member) => {
+    setEditingMember(member.id);
+    setFormData({
+      name: member.name,
+      role: member.role,
+      about: member.about,
+      image: null,
+      github: member.github || '',
+      linkedin: member.linkedin || '',
+      email: member.email || '',
+      order: member.order
+    });
+    setPreviewImage(member.image);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      let imageUrl = previewImage;
+      
+      if (formData.image) {
+        const imageRef = ref(storage, `member_images/${Date.now()}_${formData.image.name}`);
+        await uploadBytes(imageRef, formData.image);
+        imageUrl = await getDownloadURL(imageRef);
+      }
+
+      await updateDoc(doc(db, 'members', editingMember), {
+        name: formData.name,
+        role: formData.role,
+        about: formData.about,
+        ...(imageUrl && { image: imageUrl }),
+        github: formData.github,
+        linkedin: formData.linkedin,
+        email: formData.email
+      });
+
+      setEditingMember(null);
+      fetchMembers();
+    } catch (error) {
+      console.error('Error updating member:', error);
+      setError('Failed to update team member');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -281,12 +374,23 @@ const TeamManagement = () => {
         {members.map((member) => (
           <motion.div
             key={member.id}
+            draggable
+            onDragStart={(e) => handleDragStart(e, member)}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, member)}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden"
+            className="relative bg-white rounded-xl shadow-lg overflow-hidden cursor-move"
           >
             <div className="p-6">
               <div className="flex justify-end space-x-2 mb-4">
+                <button
+                  onClick={() => handleEdit(member)}
+                  className="p-1 text-blue-500 hover:bg-blue-50 rounded"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => handleDelete(member.id)}
                   className="p-1 text-red-500 hover:bg-red-50 rounded"
@@ -294,33 +398,91 @@ const TeamManagement = () => {
                   <Trash className="w-4 h-4" />
                 </button>
               </div>
-              <div className="text-center">
-                <img
-                  src={member.image || "/api/placeholder/150/150"}
-                  alt={member.name}
-                  className="w-32 h-32 object-cover rounded-full mx-auto mb-4"
-                />
-                <h3 className="text-lg font-semibold">{member.name}</h3>
-                <p className="text-blue-600">{member.role}</p>
-                <p className="text-gray-600 mt-2">{member.about}</p>
-                <div className="flex justify-center space-x-3 mt-4">
-                  {member.github && (
-                    <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
-                      <GithubIcon className="w-5 h-5" />
-                    </a>
-                  )}
-                  {member.linkedin && (
-                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
-                      <LinkedinIcon className="w-5 h-5" />
-                    </a>
-                  )}
-                  {member.email && (
-                    <a href={`mailto:${member.email}`} className="text-gray-600 hover:text-blue-600">
-                      <MailIcon className="w-5 h-5" />
-                    </a>
-                  )}
+
+              {editingMember === member.id ? (
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Role</label>
+                    <select
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      <option value="CO_PRES">Co-President</option>
+                      <option value="MEMBER">Member</option>
+                      <option value="ADVISOR">Advisor</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">About</label>
+                    <textarea
+                      value={formData.about}
+                      onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+                      rows={3}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  {/* Keep the rest of your form fields... */}
+
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingMember(null)}
+                      className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      {loading ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="text-center">
+                  <img
+                    src={member.image || "/api/placeholder/150/150"}
+                    alt={member.name}
+                    className="w-32 h-32 object-cover rounded-full mx-auto mb-4"
+                  />
+                  <h3 className="text-lg font-semibold">{member.name}</h3>
+                  <p className="text-blue-600">{member.role}</p>
+                  <p className="text-gray-600 mt-2">{member.about}</p>
+                  <div className="flex justify-center space-x-3 mt-4">
+                    {member.github && (
+                      <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
+                        <GithubIcon className="w-5 h-5" />
+                      </a>
+                    )}
+                    {member.linkedin && (
+                      <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600">
+                        <LinkedinIcon className="w-5 h-5" />
+                      </a>
+                    )}
+                    {member.email && (
+                      <a href={`mailto:${member.email}`} className="text-gray-600 hover:text-blue-600">
+                        <MailIcon className="w-5 h-5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </motion.div>
         ))}

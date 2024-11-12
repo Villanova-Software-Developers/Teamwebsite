@@ -8,7 +8,7 @@ import { useAuth } from './contexts/AuthContext';
 import Login from './pages/auth//Login';
 import Register from './pages/auth/Register';
 import JoinUs from './pages/JoinUs';
-
+import ProjectManager from './pages/admin/ProjectManager';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -55,6 +55,8 @@ function App() {
         <Route path="team" element={<TeamManagement />} />
         <Route path="projects" element={<ProjectManagement />} />
         <Route path="join-requests" element={<JoinRequestsManagement />} />
+        <Route path="project-manager" element={<ProjectManager />} />
+
       </Route>
     </Routes>
   );

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { Link } from 'react-router-dom';
+import JoinUs from './JoinUs';
+import ImmersiveModal from './ImmersiveModal';
 import { 
   Users, 
   Target, 
@@ -151,134 +154,6 @@ const AnimatedText = ({ children, delay }) => (
   </motion.div>
 );
 
-const ImmersiveModal = ({ isOpen, onClose, content }) => {
-  if (!isOpen) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50"
-      >
-        {/* Video Background with Wave Effect */}
-        <div className="absolute inset-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src="code3.mp4" type="video/mp4" />
-          </video>
-          
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/90 via-purple-900/80 to-blue-900/90" />
-          
-          {/* Animated Wave Pattern */}
-          <motion.div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: 'url("/wave-pattern.svg")',
-              backgroundSize: 'cover',
-              opacity: 0.1
-            }}
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.1, 0.15, 0.1],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
-
-        {/* Content Container */}
-        <div className="relative h-full flex items-center justify-center px-4">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="w-full max-w-4xl"
-          >
-            {/* Close Button */}
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              onClick={onClose}
-              className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
-            >
-              <X className="w-8 h-8" />
-            </motion.button>
-
-            {/* Content with Enhanced Typography and Animations */}
-            <div className="space-y-8">
-              <div className="space-y-2">
-                <AnimatedHeading text={content.title} startDelay={0.2} />
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ delay: 0.8, duration: 0.8 }}
-                  className="h-1 bg-white"
-                />
-              </div>
-
-              <AnimatedText delay={0.6}>
-                <p className="text-2xl text-white/90 tracking-wide leading-relaxed">
-                  {content.description}
-                </p>
-              </AnimatedText>
-
-              {/* Features Grid with Enhanced Typography */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-                {content.features?.map((feature, index) => (
-                  <AnimatedText key={index} delay={0.8 + index * 0.1}>
-                    <motion.div
-                      whileHover={{ 
-                        scale: 1.02,
-                        boxShadow: "0 0 20px rgba(59, 130, 246, 0.3)"
-                      }}
-                      className="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/10 transition-all"
-                    >
-                      <h3 className="text-2xl font-bold text-white mb-2 tracking-wider">
-                        {feature.title}
-                      </h3>
-                      <p className="text-lg text-white/80 tracking-wide">
-                        {feature.description}
-                      </p>
-                    </motion.div>
-                  </AnimatedText>
-                ))}
-              </div>
-
-              {/* Call to Action */}
-              <AnimatedText delay={1.2}>
-                <motion.div className="flex justify-center mt-12">
-                  <motion.button
-                   whileHover={{ 
-                    scale: 1.05,
-                    boxShadow: "0 0 30px rgba(34, 211, 238, 0.5)" // Updated to cyan color
-                  }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-cyan-400 hover:bg-cyan-500 text-white px-10 py-4 rounded-lg text-xl font-bold tracking-wider transition-all shadow-lg"
-                  >
-                    GET STARTED →
-                  </motion.button>
-                </motion.div>
-              </AnimatedText>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
-
 
 
 const whatWeDoItems = [
@@ -318,9 +193,9 @@ const Home = () => {
   });
 
   const stats = [
-    { icon: Users, label: 'Active Members', value: '50+' },
-    { icon: Target, label: 'Projects Completed', value: '25' },
-    { icon: Award, label: 'Awards Won', value: '10' },
+    { icon: Users, label: 'Active Members', value: '10+' },
+    { icon: Target, label: 'Projects Completed', value: '1' },
+    { icon: Award, label: 'Current Projects ', value: '2' },
   ];
 
   return (
@@ -434,20 +309,25 @@ const Home = () => {
       transition={{ delay: 0.8 }}
       className="flex flex-wrap gap-4"
     >
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-blue-700 transition-colors"
-      >
-        Join Us
-      </motion.button>
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-gray-50 transition-colors border border-blue-200"
-      >
-        Learn More
-      </motion.button>
+  <Link to="/join-us">
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-blue-700 transition-colors"
+  >
+    Join Us
+  </motion.button>
+</Link>
+<Link to="/submit-idea">
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-gray-50 transition-colors border border-blue-200"
+  >
+    Submit an Idea
+  </motion.button>
+</Link>
+
     </motion.div>
   </div>
 
@@ -556,23 +436,27 @@ const Home = () => {
                 Join our community of passionate individuals working together to create
                 innovative solutions and tackle challenging problems.
               </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-blue-700 transition-colors"
-              >
-                Start Collaborating
-              </motion.button>
+              <Link to="/join-us">
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="mt-4 bg-blue-600 text-white px-8 py-3 rounded-lg font-medium shadow-lg hover:bg-blue-700 transition-colors" 
+  >
+    Start Collaborating
+
+  </motion.button>
+</Link>
+
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
+            <div className="grid grid-cols-0 gap-0">
+              {[1].map((i) => (
                 <motion.div
                   key={i}
                   whileHover={{ scale: 1.05, rotate: 2 }}
                   className="aspect-square bg-white rounded-xl shadow-lg overflow-hidden"
                 >
                   <img
-                    src={`/api/placeholder/${400}/${400}`}
+                    src={`/img5.jpg`}
                     alt={`Collaboration ${i}`}
                     className="w-full h-full object-cover"
                   />

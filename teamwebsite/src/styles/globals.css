@@ -30,9 +30,12 @@
 
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
 
-  .font-tech {
-    font-family: 'Orbitron', sans-serif;
+  .font-elegant {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.02em;
+    font-feature-settings: "ss03", "zero";
   }
+  
   
   
   

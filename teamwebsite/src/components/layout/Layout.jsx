@@ -3,6 +3,29 @@ import { motion } from 'framer-motion';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
+const Logo = () => (
+  <motion.div
+    whileHover={{ scale: 1.02 }}
+    className="flex items-center overflow-hidden"
+  >
+    <div 
+      className="w-auto flex items-center justify-center"
+      style={{ height: '92px' }}
+    >
+      <img 
+        src="/vs.png"
+        alt="VSE Logo"
+        className="h-full w-auto object-contain"
+        style={{
+          filter: 'contrast(100%) brightness(100%)', // Removed extra saturation
+          transform: 'scale(1.0)', // Slightly reduced scale
+          objectFit: 'contain',
+          objectPosition: 'center',
+        }}
+      />
+    </div>
+  </motion.div>
+);
 
 const Layout = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,26 +35,23 @@ const Layout = () => {
     { path: '/projects', label: 'Projects' },
     { path: '/members', label: 'Members' },
     { path: '/submit-idea', label: 'Submit an Idea' },
-    { path: '/join-us', label: 'Join Us' },  // Added this line
+    { path: '/join-us', label: 'Join Us' },
     { path: '/faq', label: 'FAQ & Contact' },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="fixed w-full bg-white/80 backdrop-blur-md shadow-sm z-50">
+      <nav className="fixed w-full bg-white shadow-sm z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="text-xl font-bold text-gray-800"
-              >
-                Villanova Software Engineers
-              </motion.div>
+          <div className="flex justify-between" style={{ height: '96px' }}>
+            <div className="flex items-center py-2 px-3 rounded overflow-hidden bg-white"> {/* Kept solid white background */}
+              <NavLink to="/" className="flex items-center">
+                <Logo />
+              </NavLink>
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => (
                 <NavLink
                   key={item.path}
@@ -41,12 +61,12 @@ const Layout = () => {
                       isActive
                         ? 'text-blue-600 font-medium'
                         : 'text-gray-600 hover:text-blue-500'
-                    } transition-colors duration-200`
+                    } transition-colors duration-200 px-2 py-1`
                   }
                 >
                   <motion.div
                     whileHover={{ y: -2 }}
-                    className="font-medium"
+                    className="font-medium text-sm"
                   >
                     {item.label}
                   </motion.div>
@@ -93,7 +113,7 @@ const Layout = () => {
         </motion.div>
       </nav>
 
-      <main className="pt-16">
+      <main style={{ paddingTop: '96px' }}>
         <Outlet />
       </main>
     </div>

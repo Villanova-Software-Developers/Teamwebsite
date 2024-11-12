@@ -47,7 +47,7 @@ const WordContainer = ({ children, word }) => {
   return (
     <motion.div
       data-word={word}
-      className="relative text-6xl md:text-8xl font-bold whitespace-nowrap cursor-pointer"
+      className="relative text-4xl sm:text-6xl md:text-8xl font-bold whitespace-nowrap cursor-pointer"
       whileHover={{ scale: 1.05 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -58,7 +58,8 @@ const WordContainer = ({ children, word }) => {
           y="50%"
           dominantBaseline="middle"
           textAnchor="middle"
-          className="text-6xl md:text-8xl font-bold"
+          className="text-4xl sm:text-6xl md:text-8xl font-bold"
+
           fill={isHovered ? '#1a2b66' : 'white'} // Navy blue fill on hover
           stroke={isHovered ? '#1a2b66' : 'black'} // Black stroke initially, navy on hover
           strokeWidth="1"

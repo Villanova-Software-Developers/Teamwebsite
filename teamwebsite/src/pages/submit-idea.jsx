@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Upload, CheckCircle } from 'lucide-react';
+import { Send, Upload, CheckCircle, X } from 'lucide-react';
 import { storage, db } from '../contexts/AuthContext';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -23,7 +23,6 @@ const SubmitIdea = () => {
     setError('');
 
     try {
-      // Upload file to Firebase Storage if one is selected
       let fileUrl = null;
       if (formState.file) {
         const fileRef = ref(storage, `project_docs/${Date.now()}_${formState.file.name}`);
@@ -31,7 +30,6 @@ const SubmitIdea = () => {
         fileUrl = await getDownloadURL(fileRef);
       }
 
-      // Add document to Firestore
       await addDoc(collection(db, 'projectIdeas'), {
         name: formState.name,
         email: formState.email,
@@ -45,7 +43,6 @@ const SubmitIdea = () => {
       setIsSubmitting(false);
       setIsSubmitted(true);
       
-      // Reset form after 3 seconds
       setTimeout(() => {
         setIsSubmitted(false);
         setFormState({
@@ -65,7 +62,23 @@ const SubmitIdea = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormState((prev) => ({ ...prev, file }));
+    if (file && (file.type === 'application/pdf' || file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+      if (file.size <= 10 * 1024 * 1024) { // 10MB in bytes
+        setFormState((prev) => ({ ...prev, file }));
+        setError('');
+      } else {
+        setError('File size must be less than 10MB');
+        e.target.value = '';
+      }
+    } else {
+      setError('Please upload a PDF or DOC file');
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFormState((prev) => ({ ...prev, file: null }));
+    setError('');
   };
 
   const handleChange = (e) => {
@@ -73,6 +86,11 @@ const SubmitIdea = () => {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + ' B';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    else return (bytes / 1048576).toFixed(1) + ' MB';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -88,6 +106,12 @@ const SubmitIdea = () => {
               Share your innovative project ideas with us
             </p>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
+              {error}
+            </div>
+          )}
 
           {isSubmitted ? (
             <motion.div
@@ -185,33 +209,55 @@ const SubmitIdea = () => {
                 <label className="block text-sm font-medium text-gray-700">
                   Project One-pager
                 </label>
-                <motion.div
-                  whileHover={{ scale: 1.01 }}
-                  className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
-                >
-                  <div className="space-y-1 text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="flex text-sm text-gray-600">
-                      <label
-                        htmlFor="file-upload"
-                        className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                {formState.file ? (
+                  <div className="mt-1 p-4 border border-gray-300 rounded-md">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Upload className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">{formState.file.name}</p>
+                          <p className="text-xs text-gray-500">{formatFileSize(formState.file.size)}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        className="text-gray-400 hover:text-gray-500"
                       >
-                        <span>Upload a file</span>
-                        <input
-                          id="file-upload"
-                          name="file-upload"
-                          type="file"
-                          className="sr-only"
-                          onChange={handleFileChange}
-                        />
-                      </label>
-                      <p className="pl-1">or drag and drop</p>
+                        <X className="h-5 w-5" />
+                      </button>
                     </div>
-                    <p className="text-xs text-gray-500">
-                      PDF, DOC up to 10MB
-                    </p>
                   </div>
-                </motion.div>
+                ) : (
+                  <motion.div
+                    whileHover={{ scale: 1.01 }}
+                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+                  >
+                    <div className="space-y-1 text-center">
+                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                      <div className="flex text-sm text-gray-600">
+                        <label
+                          htmlFor="file-upload"
+                          className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                        >
+                          <span>Upload a file</span>
+                          <input
+                            id="file-upload"
+                            name="file-upload"
+                            type="file"
+                            className="sr-only"
+                            onChange={handleFileChange}
+                            accept=".pdf,.doc,.docx"
+                          />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        PDF, DOC up to 10MB
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
               </div>
 
               <motion.button
