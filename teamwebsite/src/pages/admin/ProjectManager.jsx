@@ -27,9 +27,7 @@ const ProjectManager = () => {
 
   const fetchProjects = async () => {
     try {
-      console.log("Fetching projects..."); // Debug log
       const querySnapshot = await getDocs(collection(db, 'projects'));
-      console.log("Projects snapshot:", querySnapshot.size); // Debug log
       
       const projectsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -43,7 +41,6 @@ const ProjectManager = () => {
         completion: doc.data().completion || 0
       }));
       
-      console.log("Processed projects:", projectsData); // Debug log
       setProjects(projectsData);
     } catch (error) {
       console.error('Error fetching projects:', error);

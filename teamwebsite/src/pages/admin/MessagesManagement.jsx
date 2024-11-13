@@ -107,7 +107,6 @@ const MessagesManagement = () => {
   }, [lastVisible, dateFilter, statusFilter]);
 
   useEffect(() => {
-    console.log("Starting message fetch"); // Debug log
     const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -117,7 +116,6 @@ const MessagesManagement = () => {
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate?.().toLocaleString() || 'N/A'
       }));
-      console.log("Processed messages:", messagesData); // Debug log
       setMessages(messagesData);
       setLoading(false);
     }, (error) => {
