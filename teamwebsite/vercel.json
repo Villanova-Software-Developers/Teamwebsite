@@ -5,15 +5,11 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://www.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.firebase.com https://*.firebaseapp.com https://*.googleapis.com wss://*.firebaseio.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://*.googleapis.com https://firebasestorage.googleapis.com; media-src 'self' blob: https://firebasestorage.googleapis.com; object-src 'self' blob:; frame-src 'self' https://*.firebaseapp.com; worker-src 'self' blob:; child-src blob:; base-uri 'self';"
+            "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://www.gstatic.com; connect-src 'self' https://*.firebaseio.com https://*.firebase.com https://*.firebaseapp.com https://*.googleapis.com wss://*.firebaseio.com https://firebasestorage.googleapis.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://*.googleapis.com https://firebasestorage.googleapis.com; media-src 'self' blob: https://firebasestorage.googleapis.com; object-src 'self' blob:; frame-src 'self' https://*.firebaseapp.com; worker-src 'self' blob:; child-src blob:;"
           },
           {
             "key": "X-Content-Type-Options",
             "value": "nosniff"
-          },
-          {
-            "key": "X-Frame-Options",
-            "value": "DENY"
           },
           {
             "key": "Strict-Transport-Security",
@@ -25,16 +21,20 @@
           },
           {
             "key": "Referrer-Policy",
-            "value": "strict-origin-when-cross-origin"
+            "value": "no-referrer-when-downgrade"
+          }
+        ]
+      },
+      {
+        "source": "/api/(.*)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=0, must-revalidate"
           }
         ]
       }
     ],
-    "redirects": [
-      {
-        "source": "http://:path*",
-        "destination": "https://:path*",
-        "permanent": true
-      }
-    ]
+    "cleanUrls": true,
+    "trailingSlash": false
   }
