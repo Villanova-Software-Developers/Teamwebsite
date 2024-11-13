@@ -23,23 +23,38 @@ const ProjectManager = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+ 
 
   const fetchProjects = async () => {
     try {
+      console.log("Fetching projects..."); // Debug log
       const querySnapshot = await getDocs(collection(db, 'projects'));
+      console.log("Projects snapshot:", querySnapshot.size); // Debug log
+      
       const projectsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        // Ensure all required fields have default values
+        title: doc.data().title || '',
+        status: doc.data().status || 'current',
+        about: doc.data().about || '',
+        image: doc.data().image || null,
+        learnMoreLink: doc.data().learnMoreLink || '',
+        completion: doc.data().completion || 0
       }));
+      
+      console.log("Processed projects:", projectsData); // Debug log
       setProjects(projectsData);
     } catch (error) {
       console.error('Error fetching projects:', error);
       setError('Failed to load projects');
     }
   };
+  
+  // Call it in useEffect
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];

@@ -1,63 +1,162 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/layout/AdminLayout';
 import { Home, Members, Projects, Faq, Team, SubmitIdea } from './pages';
 import { AdminDashboard, TeamManagement, ProjectManagement } from './pages/admin';
 import JoinRequestsManagement from './pages/admin/JoinRequestsManagement';
 import { useAuth } from './contexts/AuthContext';
-import Login from './pages/auth//Login';
+import { db } from './contexts/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import JoinUs from './pages/JoinUs';
 import ProjectManager from './pages/admin/ProjectManager';
-// Protected Route Component
+import { useNavigate } from 'react-router-dom';
+// Enhanced Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
-  
-  if (!user) {
-    return <Navigate to="/admin/login" replace />;
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log("Auth Check - Current User:", user); // Debug log
+
+      if (!user) {
+        console.log("No user - redirecting to login"); // Debug log
+        setIsLoading(false);
+        navigate('/admin/login');
+        return;
+      }
+
+      try {
+        const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+        console.log("Admin Doc Data:", adminDoc.data()); // Debug log
+
+        if (adminDoc.exists()) {
+          console.log("Admin verified"); // Debug log
+          setIsAuthorized(true);
+        } else {
+          console.log("Not an admin - redirecting"); // Debug log
+          navigate('/admin/login');
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        navigate('/admin/login');
+      }
+      
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, [user, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-lg font-medium text-gray-600">
+          Verifying access...
+        </div>
+      </div>
+    );
   }
-  
-  return children;
+
+  return isAuthorized ? children : null;
 };
+// Session timeout HOC
+const withSessionTimeout = (WrappedComponent) => {
+  return (props) => {
+    const { user, logout } = useAuth();
+    const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes
+
+    useEffect(() => {
+      if (!user) return;
+
+      let timeoutId;
+      const resetTimeout = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+          await logout();
+        }, TIMEOUT_DURATION);
+      };
+
+      // Set up event listeners
+      const events = ['mousedown', 'mousemove', 'keypress'];
+      events.forEach(event => {
+        document.addEventListener(event, resetTimeout);
+      });
+
+      // Initial timeout
+      resetTimeout();
+
+      // Cleanup
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        events.forEach(event => {
+          document.removeEventListener(event, resetTimeout);
+        });
+      };
+    }, [user, logout]);
+
+    return <WrappedComponent {...props} />;
+  };
+};
+
+const AdminLayoutWithTimeout = withSessionTimeout(AdminLayout);
 
 function App() {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/members" element={<Members />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/team" element={<Team />} />
-       < Route path="/join-us" element={<JoinUs />} />
+        <Route path="/join-us" element={<JoinUs />} />
         <Route path="/submit-idea" element={<SubmitIdea />} />
       </Route>
 
-      {/* Admin Routes */}
+      {/* Auth Routes */}
       <Route path="/admin/login" element={<Login />} />
+      
+      {/* Protected Admin Routes */}
       <Route
         path="/admin/register"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="SUPER_ADMIN">
             <Register />
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/admin"
         element={
           <ProtectedRoute>
-            <AdminLayout />
+            <AdminLayoutWithTimeout />
           </ProtectedRoute>
         }
       >
         <Route index element={<AdminDashboard />} />
-        <Route path="team" element={<TeamManagement />} />
+        <Route 
+          path="team" 
+          element={
+            <ProtectedRoute requiredRole="SUPER_ADMIN">
+              <TeamManagement />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="projects" element={<ProjectManagement />} />
         <Route path="join-requests" element={<JoinRequestsManagement />} />
         <Route path="project-manager" element={<ProjectManager />} />
-
       </Route>
+
+      {/* Catch-all route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

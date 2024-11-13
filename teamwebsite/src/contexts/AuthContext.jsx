@@ -10,15 +10,14 @@ import { getStorage } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCbIrfqY1J-LoPQG1w0Z3PHKY050P3JY-Y",
-  authDomain: "villanova-software-engineers.firebaseapp.com",
-  projectId: "villanova-software-engineers",
-  storageBucket: "villanova-software-engineers.firebasestorage.app",
-  messagingSenderId: "975272925438",
-  appId: "1:975272925438:web:6f0c66421ab1737478edaf",
-  measurementId: "G-11DGT8YF7E"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

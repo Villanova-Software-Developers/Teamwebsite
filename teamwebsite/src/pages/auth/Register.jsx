@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserPlus } from 'lucide-react';
-import { db } from '../../contexts/AuthContext';
+import { db, useAuth } from '../../contexts/AuthContext';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const Register = () => {
+  // State declarations
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -16,14 +17,66 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Check for Super Admin access
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      if (!user) {
+        navigate('/admin/login');
+        return;
+      }
+      
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (!adminDoc.exists() || adminDoc.data().role !== 'SUPER_ADMIN') {
+        navigate('/admin');
+      }
+    };
+    
+    checkSuperAdmin();
+  }, [user, navigate]);
+
+  // Error handling function
+  const handleError = (error) => {
+    setIsLoading(false);
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        setError('Email already registered');
+        break;
+      case 'auth/invalid-email':
+        setError('Invalid email address');
+        break;
+      case 'auth/weak-password':
+        setError('Password should be at least 6 characters');
+        break;
+      default:
+        setError('Failed to create account');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Validate passwords match
+    // Validate Villanova email
+    if (!formData.email.endsWith('@villanova.edu')) {
+      setError('Must use a Villanova email address');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character');
+      setIsLoading(false);
+      return;
+    }
+
+    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setIsLoading(false);
@@ -32,38 +85,27 @@ const Register = () => {
 
     try {
       const auth = getAuth();
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
 
-      // Store additional user data in Firestore
+      // Add admin record with additional security metadata
       await setDoc(doc(db, 'admins', userCredential.user.uid), {
         fullName: formData.fullName,
         email: formData.email,
         role: formData.role,
         createdAt: new Date(),
+        createdBy: user.uid,
+        lastLogin: null,
+        status: 'ACTIVE'
       });
 
       setIsLoading(false);
       navigate('/admin/login');
     } catch (error) {
-      setIsLoading(false);
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          setError('Email already registered');
-          break;
-        case 'auth/invalid-email':
-          setError('Invalid email address');
-          break;
-        case 'auth/weak-password':
-          setError('Password should be at least 6 characters');
-          break;
-        default:
-          setError('Failed to create account');
-      }
+      handleError(error);
     }
   };
 
