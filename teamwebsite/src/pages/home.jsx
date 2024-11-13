@@ -298,8 +298,8 @@ const Home = () => {
       transition={{ delay: 0.6 }}
       className="text-xl md:text-2xl text-gray-600 mb-8"
     >
-      Where innovation meets collaboration. Join us in creating amazing projects
-      and building the future together.
+      Where innovation meets collaboration. VSE is a student run organization creating amazing projects
+      and solving real life problems together.
     </motion.p>
 
     {/* Buttons */}
