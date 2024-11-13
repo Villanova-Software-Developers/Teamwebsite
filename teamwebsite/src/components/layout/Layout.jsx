@@ -13,7 +13,7 @@ const Logo = () => (
       style={{ height: '92px' }}
     >
       <img 
-        src="/vs.png"
+        src="/vs4.png"
         alt="VSE Logo"
         className="h-full w-auto object-contain"
         style={{
