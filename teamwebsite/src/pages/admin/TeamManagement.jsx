@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Plus, X, Upload, GithubIcon, 
-  LinkedinIcon, MailIcon, Edit, Trash, GripVertical 
+  LinkedinIcon, MailIcon, Edit, Trash 
 } from 'lucide-react';
 import { db, storage } from '../../contexts/AuthContext';
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';

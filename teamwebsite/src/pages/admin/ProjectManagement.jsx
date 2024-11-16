@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Search, Filter, FileText, 
-  ExternalLink, Download, Check, 
-  X, AlertCircle 
+  Search, FileText, 
+   Download, Check, 
+  X, AlertCircle, Trash2 
 } from 'lucide-react';
 import { db } from '../../contexts/AuthContext';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 
 const StatusBadge = ({ status }) => {
   const getStatusColor = () => {
@@ -38,6 +38,8 @@ const ProjectManagement = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -68,9 +70,21 @@ const ProjectManagement = () => {
         status: newStatus,
         updatedAt: new Date()
       });
-      await fetchProjects(); // Refresh the list
+      await fetchProjects();
     } catch (error) {
       console.error('Error updating status:', error);
+    }
+  };
+
+  const handleDelete = async (projectId) => {
+    try {
+      const projectRef = doc(db, 'projectIdeas', projectId);
+      await deleteDoc(projectRef);
+      await fetchProjects();
+      setShowDeleteConfirm(false);
+      setProjectToDelete(null);
+    } catch (error) {
+      console.error('Error deleting project:', error);
     }
   };
 
@@ -183,6 +197,16 @@ const ProjectManagement = () => {
                   >
                     <X className="w-5 h-5" />
                   </button>
+                  <button
+                    onClick={() => {
+                      setProjectToDelete(project);
+                      setShowDeleteConfirm(true);
+                    }}
+                    className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                    title="Delete Project"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -268,6 +292,39 @@ const ProjectManagement = () => {
                   Accept Project
                 </button>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full"
+          >
+            <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the project "{projectToDelete.projectTitle}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setProjectToDelete(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(projectToDelete.id)}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Delete
+              </button>
             </div>
           </motion.div>
         </div>

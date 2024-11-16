@@ -2,10 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, Download, Check, 
-  X, AlertCircle, FileText 
+  X, FileText,
+  Trash2 // Added Trash2 icon for delete
 } from 'lucide-react';
 import { db } from '../../contexts/AuthContext';
-import { collection, getDocs, updateDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { 
+  collection, 
+   
+  updateDoc, 
+  doc, 
+  onSnapshot, 
+  query, 
+  orderBy,
+  deleteDoc // Added deleteDoc
+} from 'firebase/firestore';
 
 const StatusBadge = ({ status }) => {
   const getStatusColor = () => {
@@ -34,6 +44,8 @@ const JoinRequestsManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState(null);
 
   useEffect(() => {
     const q = query(collection(db, 'joinRequests'), orderBy('createdAt', 'desc'));
@@ -63,6 +75,18 @@ const JoinRequestsManagement = () => {
       });
     } catch (error) {
       console.error('Error updating status:', error);
+    }
+  };
+
+  // Add delete handler
+  const handleDelete = async (requestId) => {
+    try {
+      const requestRef = doc(db, 'joinRequests', requestId);
+      await deleteDoc(requestRef);
+      setShowDeleteConfirm(false);
+      setRequestToDelete(null);
+    } catch (error) {
+      console.error('Error deleting request:', error);
     }
   };
 
@@ -145,6 +169,16 @@ const JoinRequestsManagement = () => {
                     title="Reject Request"
                   >
                     <X className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRequestToDelete(request);
+                      setShowDeleteConfirm(true);
+                    }}
+                    className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                    title="Delete Request"
+                  >
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -235,6 +269,39 @@ const JoinRequestsManagement = () => {
                   Reject Application
                 </button>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full"
+          >
+            <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the join request from {requestToDelete.name}? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setRequestToDelete(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(requestToDelete.id)}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Delete
+              </button>
             </div>
           </motion.div>
         </div>
