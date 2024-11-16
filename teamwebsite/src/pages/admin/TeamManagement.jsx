@@ -319,7 +319,7 @@ const TeamManagement = () => {
                 />
               </div>
 
-             // ... (previous code remains the same until the LinkedIn input)
+      
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
