@@ -118,7 +118,7 @@ const MemberRegistrationForm = () => {
             rows={3}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             required
-            placeholder="Tell us about yourself, your interests, and why you want to join..."
+            placeholder="Your simple bios."
           />
         </div>
 
@@ -143,7 +143,7 @@ const MemberRegistrationForm = () => {
               />
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-500">Optional. Maximum file size: 5MB</p>
+          <p className="mt-1 text-sm text-gray-500"> Maximum file size: 5MB</p>
         </div>
 
         <div>
@@ -155,7 +155,7 @@ const MemberRegistrationForm = () => {
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="https://github.com/yourusername"
           />
-          <p className="mt-1 text-sm text-gray-500">Optional</p>
+          <p className="mt-1 text-sm text-gray-500"></p>
         </div>
 
         <div>
@@ -167,7 +167,7 @@ const MemberRegistrationForm = () => {
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="https://linkedin.com/in/yourusername"
           />
-          <p className="mt-1 text-sm text-gray-500">Optional</p>
+          <p className="mt-1 text-sm text-gray-500"></p>
         </div>
 
         <button
