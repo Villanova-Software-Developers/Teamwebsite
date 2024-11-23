@@ -21,7 +21,7 @@ const WeeklyTasks = () => {
   const weeklyTasks = [
     {
       name: "Swopnil Panday",
-      role: "Lead/Backend/ML",
+      role: "Backend/ML",
       tasks: [
         {
           title: "Project Setup",
