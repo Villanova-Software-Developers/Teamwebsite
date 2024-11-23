@@ -11,7 +11,7 @@ const MemberRegistration = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Join Our Team</h1>
           <p className="mt-2 text-lg text-gray-600">
-            Submit your application to become a member of our community
+            Submit your profile to get yourself on our page
           </p>
         </div>
         <MemberRegistrationForm />
