@@ -20,84 +20,133 @@ const WeeklyTasks = () => {
 
   const weeklyTasks = [
     {
-      name: "Swopnil Panday",
-      role: "Backend/ML",
-      tasks: [
-        {
-          title: "Project Setup",
-          details: [
-            "Create GitHub repository and invite team members",
-            "Set up basic Django project structure",
-            "Create README with setup instructions",
-            "Set up basic project folders"
-          ]
-        },
-        {
-          title: "Development Guidelines",
-          details: [
-            "Write coding standards document",
-            "Create branch naming conventions",
-            "Document how to run the project locally",
-            "Set up team communication channels"
-          ]
-        }
-      ],
-      learningFocus: [
-        {
-          topic: "Project Management",
-          resources: [
-            "GitHub Project Management basics",
-            "Team collaboration tools",
-            "Basic Git commands guide"
-          ]
-        }
-      ],
-      tools: ["GitHub", "Django", "VS Code"],
-      deliverables: [
-        "Working repository structure",
-        "Project documentation",
-        "Development guidelines"
-      ]
-    },
+        name: "Swopnil Panday",
+        role: "Backend/ML",
+        tasks: [
+          {
+            title: "Setting up GitHub repository structure",
+            details: [
+              "Create main repository with proper .gitignore",
+              "Set up branch protection rules",
+              "Configure GitHub Actions for CI/CD",
+              "Create documentation structure in wiki"
+            ]
+          },
+          {
+            title: "Configuring development environment",
+            details: [
+              "Set up Django project structure",
+              "Configure PostgreSQL database",
+              "Set up virtual environment",
+              "Create requirements.txt with necessary packages"
+            ]
+          },
+          {
+            title: "Backend architecture planning",
+            details: [
+              "Design REST API endpoints structure",
+              "Plan database schema",
+              "Document authentication flow",
+              "Create system architecture diagrams"
+            ]
+          },
+          {
+            title: "ML pipeline initial setup",
+            details: [
+              "Set up basic ML environment",
+              "Configure model training pipeline",
+              "Plan data preprocessing steps",
+              "Design feature extraction system"
+            ]
+          }
+        ],
+        learningFocus: [
+          {
+            topic: "Review latest ML deployment practices",
+            resources: [
+              "TensorFlow Serving documentation",
+              "MLOps best practices guide",
+              "Model deployment patterns"
+            ]
+          },
+          {
+            topic: "Backend architecture patterns",
+            resources: [
+              "Django REST framework documentation",
+              "Microservices architecture patterns",
+              "API security best practices"
+            ]
+          }
+        ],
+        tools: [
+          "Django",
+          "PostgreSQL",
+          "Docker",
+          "TensorFlow",
+          "Git"
+        ],
+        deliverables: [
+          "Complete GitHub repository setup",
+          "Development environment guide",
+          "Architecture documentation",
+          "Initial ML pipeline structure"
+        ]
+      },
+  
     {
-      name: "Jack McIntyre",
-      role: "Frontend",
-      tasks: [
-        {
-          title: "Simple Login Page",
-          details: [
-            "Create a basic login form with email and password",
-            "Add simple form validation (check if fields are empty)",
-            "Make the page look nice with TailwindCSS",
-            "Add a loading spinner when form submits"
-          ]
-        },
-        {
-          title: "User Profile Page",
-          details: [
-            "Create a form to enter name and bio",
-            "Add ability to list skills (simple text input)",
-            "Make it mobile-friendly using Tailwind",
-            "Add a preview of how profile looks"
-          ]
-        }
-      ],
-      learningFocus: [
-        {
-          topic: "React Basics",
-          resources: [
-            "How to create React components",
-            "Using useState for form handling",
-            "Basic TailwindCSS classes"
-          ]
-        }
-      ],
-      tools: ["React", "TailwindCSS"],
-      deliverables: [
-        "Working login form",
-        "Basic profile page"
-      ]
-    },
+        name: "Jack McIntyre",
+        role: "Frontend",
+        tasks: [
+          {
+            title: "Create login page design mockup",
+            details: [
+              "Design responsive login form",
+              "Implement form validation",
+              "Create password reset flow",
+              "Add social login options"
+            ]
+          },
+          {
+            title: "Build basic profile page structure",
+            details: [
+              "Create profile information form",
+              "Implement avatar upload",
+              "Design skills section",
+              "Add project preferences area"
+            ]
+          }
+        ],
+        learningFocus: [
+          {
+            topic: "React Crash Course",
+            resources: [
+              "React official documentation",
+              "React hooks tutorial",
+              "Component lifecycle guide"
+            ]
+          },
+          {
+            topic: "HTML/CSS Basics",
+            resources: [
+              "Flexbox tutorial",
+              "CSS Grid guide",
+              "Responsive design patterns"
+            ]
+          }
+        ],
+        tools: [
+          "React",
+          "TailwindCSS",
+          "Framer Motion",
+          "React Hook Form"
+        ],
+        deliverables: [
+          "Login page mockup",
+          "Working login form",
+          "Basic profile page",
+          "Form validation implementation"
+        ]
+      },
     {
       name: "Kyle Swett",
       role: "Backend/ML",
@@ -287,7 +336,7 @@ const WeeklyTasks = () => {
           details: [
             "Create list of interest categories",
             "Write simple categorization function",
-            "Create test data",
+            "Extraction of Skills, Interests, and experience from Resume",
             "Add basic matching logic"
           ]
         }
@@ -375,11 +424,9 @@ const WeeklyTasks = () => {
         {
           title: "Data Collection",
           details: [
-            "Create simple CSV files with test data",
+            "Create simple CSV files with test data. Data includes things like interests, skills, experiences in years.",
             "Write basic data loading function",
-            "Add simple data validation",
-            "Create data documentation"
-          ]
+            "Add simple data validation"          ]
         }
       ],
       learningFocus: [
