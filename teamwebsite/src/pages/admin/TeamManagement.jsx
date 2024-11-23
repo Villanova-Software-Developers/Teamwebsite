@@ -5,8 +5,21 @@ import {
   LinkedinIcon, MailIcon, Edit, Trash 
 } from 'lucide-react';
 import { db, storage } from '../../contexts/AuthContext';
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  deleteDoc, 
+  doc, 
+  updateDoc, 
+  onSnapshot, 
+  query, 
+  orderBy,
+  writeBatch,
+  getDoc 
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+
 
 const TeamManagement = () => {
   const [members, setMembers] = useState([]);
@@ -28,8 +41,34 @@ const TeamManagement = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchMembers();
+    try {
+      setLoading(true);
+      const q = query(collection(db, 'members'), orderBy('order', 'asc'));
+      
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const membersData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          order: doc.data().order || 0
+        }));
+        setMembers(membersData);
+        setLoading(false);
+      }, (error) => {
+        console.error('Error in snapshot listener:', error);
+        setError('Failed to load team members');
+        setLoading(false);
+      });
+  
+      return () => unsubscribe();
+    } catch (error) {
+      console.error('Error setting up listener:', error);
+      setError('Failed to load team members');
+      setLoading(false);
+    }
   }, []);
+
+ 
+
 
   const fetchMembers = async () => {
     try {
@@ -200,16 +239,32 @@ const TeamManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this member?')) {
-      try {
-        await deleteDoc(doc(db, 'members', id));
-        fetchMembers();
-      } catch (error) {
-        console.error('Error deleting member:', error);
-        setError('Failed to delete team member');
-      }
+  if (window.confirm('Are you sure you want to delete this member?')) {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Starting deletion process for ID:', id);
+
+      // Delete directly from Firestore
+      await deleteDoc(doc(db, 'members', id));
+      console.log('Document deleted successfully');
+
+    } catch (error) {
+      console.error('Error deleting member:', error);
+      setError(`Failed to delete team member: ${error.message}`);
+      
+      // Log additional error details
+      console.log('Error details:', {
+        code: error.code,
+        message: error.message,
+        fullError: error
+      });
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+};
 
   return (
     <div className="space-y-6">

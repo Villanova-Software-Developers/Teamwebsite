@@ -13,6 +13,9 @@ import Register from './pages/auth/Register';
 import JoinUs from './pages/JoinUs';
 import ProjectManager from './pages/admin/ProjectManager';
 import { useNavigate } from 'react-router-dom';
+import MemberRegistration from './pages/MemberRegistration'; // Add this import
+import PendingMembers from './pages/admin/PendingMembers'; // Add this import
+import WeeklyTasks from './pages/WeeklyTasks';
 // Enhanced Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -118,6 +121,10 @@ function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/join-us" element={<JoinUs />} />
         <Route path="/submit-idea" element={<SubmitIdea />} />
+        <Route path="/register-member" element={<MemberRegistration />} /> 
+        <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
+
+
       </Route>
 
       {/* Auth Routes */}
@@ -153,6 +160,14 @@ function App() {
         <Route path="projects" element={<ProjectManagement />} />
         <Route path="join-requests" element={<JoinRequestsManagement />} />
         <Route path="project-manager" element={<ProjectManager />} />
+        <Route 
+          path="pending-members" 
+          element={
+            <ProtectedRoute requiredRole="SUPER_ADMIN">
+              <PendingMembers />
+            </ProtectedRoute>
+          }
+        /> {/* Add this route */}
       </Route>
 
       {/* Catch-all route */}

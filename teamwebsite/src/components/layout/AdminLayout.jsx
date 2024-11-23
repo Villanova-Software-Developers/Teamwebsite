@@ -1,13 +1,13 @@
-// components/layout/AdminLayout.jsx
 import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, Users, FileText, 
-  LogOut 
+  LogOut, UserPlus 
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ProjectManager from '../../pages/admin/ProjectManager';
+
 const AdminLayout = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const AdminLayout = () => {
   const navItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/admin/team', icon: Users, label: 'Team' },
+    { path: '/admin/pending-members', icon: UserPlus, label: 'Member Requests' }, // Added this
     { path: '/admin/projects', icon: FileText, label: 'Projects' },
     { path: '/admin/project-manager', icon: FileText, label: 'projectmanager' },
   ];
