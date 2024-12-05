@@ -15,6 +15,7 @@ import ProjectManager from './pages/admin/ProjectManager';
 import { useNavigate } from 'react-router-dom';
 import MemberRegistration from './pages/MemberRegistration'; // Add this import
 import PendingMembers from './pages/admin/PendingMembers'; // Add this import
+import MedicalQA from './pages/Medicalqa';
 import WeeklyTasks from './pages/WeeklyTasks';
 // Enhanced Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -123,6 +124,7 @@ function App() {
         <Route path="/submit-idea" element={<SubmitIdea />} />
         <Route path="/register-member" element={<MemberRegistration />} /> 
         <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
+        <Route path="/medical-qa" element={<MedicalQA />} />
 
 
       </Route>
