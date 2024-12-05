@@ -18,7 +18,7 @@ const MedicalQA = () => {
     if (!question.trim()) return;
     setIsLoading(true);
     try {
-      const response = await fetch('http://104.154.103.87:8000/api/generate', {
+      const response = await fetch('https://104.154.103.87:8000/api/generate', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({question, settings})
