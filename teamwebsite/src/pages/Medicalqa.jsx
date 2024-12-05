@@ -16,25 +16,13 @@ const MedicalQA = () => {
 
   const handleSubmit = async () => {
     if (!question.trim()) return;
-    
     setIsLoading(true);
     try {
       const response = await fetch('http://104.154.103.87:8000/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question,
-          settings: {
-            maxLength: settings.maxLength,
-            temperature: settings.temperature,
-            topP: settings.topP,
-            repetitionPenalty: settings.repetitionPenalty
-          }
-        })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({question, settings})
       });
-  
-      if (!response.ok) throw new Error('API request failed');
-      
       const data = await response.json();
       setResponse(data);
     } catch (error) {
