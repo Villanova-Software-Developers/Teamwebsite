@@ -13,7 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 
  function MedicalQA() {
-    const [apiBaseUrl, setApiBaseUrl] = useState('https://2a27-34-56-85-212.ngrok-free.app');
+    const [apiBaseUrl, setApiBaseUrl] = useState('https://2422-34-56-123-23.ngrok-free.app');
     const [showApiInput, setShowApiInput] = useState(false);
         const [messages, setMessages] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -169,7 +169,7 @@ const MODELS = [
         throw new Error('API Base URL is not configured');
       }
   
-      // Prepare conversation history with validation
+      // Prepare conversation history with validatio
       const conversationHistory = messages
         .filter(msg => msg.role && msg.content) // Only include valid messages
         .map(msg => ({
@@ -182,6 +182,7 @@ const MODELS = [
       const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
   
       const response = await fetch(`${apiBaseUrl}${selectedModel.endpoint}`, {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
