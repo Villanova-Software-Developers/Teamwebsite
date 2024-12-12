@@ -17,6 +17,7 @@ import MemberRegistration from './pages/MemberRegistration'; // Add this import
 import PendingMembers from './pages/admin/PendingMembers'; // Add this import
 import MedicalQA from './pages/Medicalqa';
 import WeeklyTasks from './pages/WeeklyTasks';
+import BasicLayout from './components/layout/BasicLayout';
 // Enhanced Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -124,9 +125,12 @@ function App() {
         <Route path="/submit-idea" element={<SubmitIdea />} />
         <Route path="/register-member" element={<MemberRegistration />} /> 
         <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
+
+
+      </Route>
+       {/* Route without navbar */}
+       <Route element={<BasicLayout />}>
         <Route path="/medical-qa" element={<MedicalQA />} />
-
-
       </Route>
 
       {/* Auth Routes */}
