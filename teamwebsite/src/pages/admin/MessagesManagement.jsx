@@ -217,11 +217,12 @@ const MessagesManagement = () => {
   };
 
   // Filter and search functionality
-  const filteredMessages = messages.filter(message =>
-    message.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    message.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    message.message.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+// Update the filteredMessages definition with null checks
+const filteredMessages = messages.filter(message =>
+  (message?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+  (message?.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+  (message?.message?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+);
 
   return (
     <div className="space-y-6">
