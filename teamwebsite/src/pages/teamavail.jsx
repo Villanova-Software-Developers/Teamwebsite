@@ -75,14 +75,13 @@ const TimeAvailability = () => {
             <h1 className="text-4xl font-bold text-gray-900 mb-6 font-sans">Spring 2025 Availability</h1>
             <div className="mt-6 text-black-600 space-y-4 max-w-3xl mx-auto">
               <p className="text-lg font-sans leading-relaxed">
-                We are excited to announce our collaboration with VCG Group on the Optima application project and 
-                DOW RITE (Reaching, Inspiring, Teaching, Empowering) initiative. This semester offers unique opportunities 
-                to work on impactful projects that make a real difference in our community.
+              We are excited to announce our collaboration with VCG Group on the Optima application project. 
+                This is a great opportunity to work on a real-world project and gain valuable experience. 
+                We also have couple of projects from two other non profits and people can choose which they want to work on.
               </p>
               <p className="text-lg">
-                The DOW RITE program focuses on mentoring and empowering students through hands-on technology projects. 
-                Along with VCG Group's Optima application, we also have projects from two other non-profits. You'll have 
-                the flexibility to choose your project focus.
+              Please indicate your availability for our weekly team meetings and your planned contribution hours. 
+                We'll use this information to schedule our Spring 2025 sessions and organize project workload.
               </p>
               <p className="text-lg font-medium mt-4">
                 Please select all time slots when you're available for team meetings. Multiple selections help us find 
