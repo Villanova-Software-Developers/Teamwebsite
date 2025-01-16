@@ -7,7 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 const TimeAvailability = () => {
   const [formState, setFormState] = useState({
     name: '',
-    timePreference: '',
+    timePreferences: [], // Changed to array for multiple selection
     customTime: '',
     weeklyHours: '',
   });
@@ -23,7 +23,7 @@ const TimeAvailability = () => {
     try {
       await addDoc(collection(db, 'timeAvailability'), {
         name: formState.name,
-        timePreference: formState.timePreference,
+        timePreferences: formState.timePreferences,
         customTime: formState.customTime,
         weeklyHours: formState.weeklyHours,
         semester: 'Spring 2025',
@@ -37,7 +37,7 @@ const TimeAvailability = () => {
         setIsSubmitted(false);
         setFormState({
           name: '',
-          timePreference: '',
+          timePreferences: [],
           customTime: '',
           weeklyHours: '',
         });
@@ -47,6 +47,15 @@ const TimeAvailability = () => {
       setIsSubmitting(false);
       console.error('Submission error:', error);
     }
+  };
+
+  const handleTimePreferenceChange = (value) => {
+    setFormState((prev) => {
+      const timePreferences = prev.timePreferences.includes(value)
+        ? prev.timePreferences.filter(time => time !== value)
+        : [...prev.timePreferences, value];
+      return { ...prev, timePreferences };
+    });
   };
 
   const handleChange = (e) => {
@@ -63,16 +72,21 @@ const TimeAvailability = () => {
           className="bg-white rounded-2xl shadow-xl p-10"
         >
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6 font-sans Arial">Spring 2025 Availability</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-6 font-sans">Spring 2025 Availability</h1>
             <div className="mt-6 text-black-600 space-y-4 max-w-3xl mx-auto">
               <p className="text-lg font-sans leading-relaxed">
-                We are excited to announce our collaboration with VCG Group on the Optima application project. 
-                This is a great opportunity to work on a real-world project and gain valuable experience. 
-                We also have couple of projects from two other non profits and people can choose which they want to work on.
+                We are excited to announce our collaboration with VCG Group on the Optima application project and 
+                DOW RITE (Reaching, Inspiring, Teaching, Empowering) initiative. This semester offers unique opportunities 
+                to work on impactful projects that make a real difference in our community.
               </p>
               <p className="text-lg">
-                Please indicate your availability for our weekly team meetings and your planned contribution hours. 
-                We'll use this information to schedule our Spring 2025 sessions and organize project workload.
+                The DOW RITE program focuses on mentoring and empowering students through hands-on technology projects. 
+                Along with VCG Group's Optima application, we also have projects from two other non-profits. You'll have 
+                the flexibility to choose your project focus.
+              </p>
+              <p className="text-lg font-medium mt-4">
+                Please select all time slots when you're available for team meetings. Multiple selections help us find 
+                the best time that works for everyone.
               </p>
             </div>
           </div>
@@ -120,7 +134,7 @@ const TimeAvailability = () => {
 
               <div className="bg-gray-50 p-6 rounded-xl">
                 <label className="block text-lg font-medium text-gray-700 mb-4">
-                  Meeting Time Preference
+                  Meeting Time Preferences (Select all that work for you)
                 </label>
                 <div className="space-y-4">
                   {[
@@ -130,13 +144,11 @@ const TimeAvailability = () => {
                   ].map((option) => (
                     <div key={option.value} className="flex items-center bg-white p-4 rounded-lg border border-gray-200">
                       <input
-                        type="radio"
+                        type="checkbox"
                         id={option.value}
-                        name="timePreference"
-                        value={option.value}
-                        checked={formState.timePreference === option.value}
-                        onChange={handleChange}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        checked={formState.timePreferences.includes(option.value)}
+                        onChange={() => handleTimePreferenceChange(option.value)}
+                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                       <label
                         htmlFor={option.value}
@@ -148,13 +160,11 @@ const TimeAvailability = () => {
                   ))}
                   <div className="flex items-center bg-white p-4 rounded-lg border border-gray-200">
                     <input
-                      type="radio"
+                      type="checkbox"
                       id="other"
-                      name="timePreference"
-                      value="other"
-                      checked={formState.timePreference === 'other'}
-                      onChange={handleChange}
-                      className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                      checked={formState.timePreferences.includes('other')}
+                      onChange={() => handleTimePreferenceChange('other')}
+                      className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <label
                       htmlFor="other"
@@ -166,13 +176,13 @@ const TimeAvailability = () => {
                 </div>
               </div>
 
-              {formState.timePreference === 'other' && (
+              {formState.timePreferences.includes('other') && (
                 <div className="bg-gray-50 p-6 rounded-xl">
                   <label
                     htmlFor="customTime"
                     className="block text-lg font-medium text-gray-700 mb-3"
                   >
-                    Specify Your Availability
+                    Specify Additional Availability
                   </label>
                   <motion.textarea
                     whileFocus={{ scale: 1.01 }}
@@ -182,7 +192,7 @@ const TimeAvailability = () => {
                     value={formState.customTime}
                     onChange={handleChange}
                     required
-                    placeholder="Please specify your preferred days and times..."
+                    placeholder="Please specify any other days and times that work for you..."
                     className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base"
                   />
                 </div>

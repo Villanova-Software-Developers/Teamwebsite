@@ -73,18 +73,29 @@ const TimeAvailabilityAdmin = () => {
   // Calculate statistics
   const calculateStats = () => {
     const totalSubmissions = submissions.length;
+    
+    // Count all time preferences (now handling arrays)
     const timePreferences = submissions.reduce((acc, sub) => {
-      acc[sub.timePreference] = (acc[sub.timePreference] || 0) + 1;
+      if (Array.isArray(sub.timePreferences)) {
+        sub.timePreferences.forEach(pref => {
+          acc[pref] = (acc[pref] || 0) + 1;
+        });
+      }
       return acc;
     }, {});
 
     const avgWeeklyHours = submissions.reduce((acc, sub) => 
       acc + (parseInt(sub.weeklyHours) || 0), 0) / totalSubmissions || 0;
 
+    // Find most popular time slot
+    const mostPopularTime = Object.entries(timePreferences)
+      .sort(([,a], [,b]) => b - a)[0]?.[0] || 'None';
+
     return {
       totalSubmissions,
       timePreferences,
-      avgWeeklyHours: avgWeeklyHours.toFixed(1)
+      avgWeeklyHours: avgWeeklyHours.toFixed(1),
+      mostPopularTime
     };
   };
 
@@ -104,6 +115,20 @@ const TimeAvailabilityAdmin = () => {
   const filteredSubmissions = submissions.filter(submission => 
     submission.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const formatTimePreferences = (preferences) => {
+    if (!Array.isArray(preferences)) return 'None specified';
+    
+    return preferences.map(pref => {
+      switch(pref) {
+        case 'tuesday': return 'Tuesday 7-9 PM';
+        case 'wednesday': return 'Wednesday 7-9 PM';
+        case 'thursday': return 'Thursday 7-9 PM';
+        case 'other': return 'Other';
+        default: return pref;
+      }
+    }).join(', ');
+  };
 
   if (loading) {
     return <div className="text-center py-8">Loading submissions...</div>;
@@ -170,8 +195,10 @@ const TimeAvailabilityAdmin = () => {
             <div className="ml-4">
               <p className="text-sm text-gray-600">Most Popular Time</p>
               <p className="text-2xl font-bold capitalize">
-                {Object.entries(stats.timePreferences)
-                  .sort(([,a], [,b]) => b - a)[0]?.[0] || 'None'}
+                {stats.mostPopularTime === 'tuesday' ? 'Tuesday' :
+                 stats.mostPopularTime === 'wednesday' ? 'Wednesday' :
+                 stats.mostPopularTime === 'thursday' ? 'Thursday' :
+                 stats.mostPopularTime}
               </p>
             </div>
           </div>
@@ -185,7 +212,7 @@ const TimeAvailabilityAdmin = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-xl shadow-lg p-6"
         >
-          <h3 className="text-lg font-semibold mb-4">Time Preference Distribution</h3>
+          <h3 className="text-lg font-semibold mb-4">Time Slot Popularity</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -248,7 +275,7 @@ const TimeAvailabilityAdmin = () => {
                 <div>
                   <h3 className="text-lg font-semibold">{submission.name}</h3>
                   <p className="text-gray-600 mt-1">
-                    Preferred Time: <span className="capitalize">{submission.timePreference}</span>
+                    Available Times: {formatTimePreferences(submission.timePreferences)}
                   </p>
                   <p className="text-gray-600">Weekly Hours: {submission.weeklyHours}</p>
                   <p className="text-gray-500 text-sm mt-1">Submitted: {submission.createdAt}</p>
@@ -300,13 +327,13 @@ const TimeAvailabilityAdmin = () => {
               
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700">Time Preference</h4>
-                  <p className="mt-1 text-gray-600 capitalize">{selectedSubmission.timePreference}</p>
+                  <h4 className="text-sm font-medium text-gray-700">Available Time Slots</h4>
+                  <p className="mt-1 text-gray-600">{formatTimePreferences(selectedSubmission.timePreferences)}</p>
                 </div>
 
                 {selectedSubmission.customTime && (
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700">Custom Time Details</h4>
+                    <h4 className="text-sm font-medium text-gray-700">Additional Time Details</h4>
                     <p className="mt-1 text-gray-600">{selectedSubmission.customTime}</p>
                   </div>
                 )}
@@ -341,8 +368,7 @@ const TimeAvailabilityAdmin = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full"
-          >
+            className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full">
             <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete the availability submission from {submissionToDelete.name}? 
