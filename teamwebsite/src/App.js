@@ -18,6 +18,8 @@ import PendingMembers from './pages/admin/PendingMembers'; // Add this import
 import MedicalQA from './pages/Medicalqa';
 import WeeklyTasks from './pages/WeeklyTasks';
 import BasicLayout from './components/layout/BasicLayout';
+import TimeAvailability from './pages/teamavail';
+import TimeAvailabilityAdmin from './pages/admin/avail';
 // Enhanced Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -125,6 +127,8 @@ function App() {
         <Route path="/submit-idea" element={<SubmitIdea />} />
         <Route path="/register-member" element={<MemberRegistration />} /> 
         <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
+        <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
+
 
 
       </Route>
@@ -166,6 +170,8 @@ function App() {
         <Route path="projects" element={<ProjectManagement />} />
         <Route path="join-requests" element={<JoinRequestsManagement />} />
         <Route path="project-manager" element={<ProjectManager />} />
+        <Route path="avail" element={<TimeAvailabilityAdmin />} />
+
         <Route 
           path="pending-members" 
           element={
