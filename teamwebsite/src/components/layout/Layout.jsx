@@ -2,23 +2,21 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-
 const Logo = () => (
   <motion.div
     whileHover={{ scale: 1.02 }}
     className="flex items-center overflow-hidden"
   >
-    <div 
+    <div
       className="w-auto flex items-center justify-center"
-      style={{ height: '92px' }}
+      style={{ height: '170px' }} 
     >
-      <img 
-        src="/vs4.png"
+      <img
+        src="/1.png"
         alt="VSE Logo"
-        className="h-full w-auto object-contain"
+        className="h-full w-auto object-contain hover:opacity-90 transition-opacity duration-200"
         style={{
-          filter: 'contrast(100%) brightness(100%)', // Removed extra saturation
-          transform: 'scale(1.0)', // Slightly reduced scale
+          filter: 'contrast(100%) brightness(100%)',
           objectFit: 'contain',
           objectPosition: 'center',
         }}
