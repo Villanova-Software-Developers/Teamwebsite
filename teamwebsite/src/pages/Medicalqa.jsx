@@ -13,7 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 
  function MedicalQA() {
-    const [apiBaseUrl, setApiBaseUrl] = useState('https://201e-153-104-35-220.ngrok-free.app');
+    const [apiBaseUrl, setApiBaseUrl] = useState('https://148f-153-104-35-220.ngrok-free.app');
     const [showApiInput, setShowApiInput] = useState(false);
         const [messages, setMessages] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');

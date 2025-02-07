@@ -20,7 +20,7 @@ const MedicalQA = () => {
     if (!question.trim()) return;
     setIsLoading(true);
     try {
-      const response = await fetch('https://201e-153-104-35-220.ngrok-free.app', {
+      const response = await fetch('https://148f-153-104-35-220.ngrok-free.app', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({question, settings})
