@@ -20,6 +20,9 @@ import WeeklyTasks from './pages/WeeklyTasks';
 import BasicLayout from './components/layout/BasicLayout';
 import TimeAvailability from './pages/teamavail';
 import TimeAvailabilityAdmin from './pages/admin/avail';
+import Star from './pages/star';
+import ActivityAndChatPage from './pages/s';
+import ResultsAnalysisPage from './pages/trick';
 // Enhanced Protected Route Component
 //test
 //sd
@@ -130,6 +133,7 @@ function App() {
         <Route path="/register-member" element={<MemberRegistration />} /> 
         <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
         <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
+    
 
 
 
@@ -137,6 +141,9 @@ function App() {
        {/* Route without navbar */}
        <Route element={<BasicLayout />}>
         <Route path="/medical-qa" element={<MedicalQA />} />
+        <Route path="/s" element={<Star />} />
+          <Route path="/ss" element={<ActivityAndChatPage />} />
+          <Route path="/f" element={<ResultsAnalysisPage />} />
       </Route>
 
       {/* Auth Routes */}
