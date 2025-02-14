@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, AlertCircle, RepeatIcon, Volume2 } from 'lucide-react';
+import { Mic, MicOff, AlertCircle } from 'lucide-react';
 
 const VoiceAssistant = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -7,63 +7,21 @@ const VoiceAssistant = () => {
   const [response, setResponse] = useState('');
   const [error, setError] = useState('');
   const [status, setStatus] = useState('idle');
-  const [isSpeaking, setIsSpeaking] = useState(false);
   
   const recognitionRef = useRef(null);
   const transcriptPartsRef = useRef([]);
-  const speechSynthesisRef = useRef(null);
 
   const OPENAI_API_KEY = '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';
   const API_URL = 'https://api.openai.com/v1/chat/completions';
 
   useEffect(() => {
     initializeSpeechRecognition();
-    initializeSpeechSynthesis();
-    
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
-      if (speechSynthesisRef.current) {
-        window.speechSynthesis.cancel();
-      }
     };
   }, []);
-
-  const initializeSpeechSynthesis = () => {
-    if (!('speechSynthesis' in window)) {
-      setError('Speech synthesis is not supported in this browser.');
-      return;
-    }
-    
-    speechSynthesisRef.current = window.speechSynthesis;
-  };
-
-  const speakResponse = (text) => {
-    if (!speechSynthesisRef.current) return;
-    
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1; // Faster speech rate
-    utterance.pitch = 1;
-    
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
-      setIsSpeaking(false);
-    };
-    
-    speechSynthesisRef.current.speak(utterance);
-  };
-
-  const repeatLastResponse = () => {
-    if (response) {
-      speakResponse(response);
-    }
-  };
 
   const initializeSpeechRecognition = () => {
     if (!('webkitSpeechRecognition' in window)) {
@@ -74,13 +32,14 @@ const VoiceAssistant = () => {
     try {
       const SpeechRecognition = window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
+      recognitionRef.current.continuous = true; // Set to true for continuous recording
       recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = 'en-US';
 
       recognitionRef.current.onstart = () => {
         console.log('Recording started');
         setError('');
+        // Reset transcript parts when starting new recording
         transcriptPartsRef.current = [];
       };
 
@@ -98,16 +57,20 @@ const VoiceAssistant = () => {
       recognitionRef.current.onresult = (event) => {
         let interimTranscript = '';
         
+        // Process all results, including interim ones
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
           
           if (event.results[i].isFinal) {
+            // Add final results to our transcript parts array
             transcriptPartsRef.current.push(transcript.trim());
           } else {
+            // Collect interim results
             interimTranscript += transcript;
           }
         }
         
+        // Combine all final transcripts with the current interim transcript
         const fullTranscript = [
           ...transcriptPartsRef.current,
           interimTranscript
@@ -143,13 +106,16 @@ const VoiceAssistant = () => {
 
   const toggleRecording = async () => {
     if (isRecording) {
+      // Stop recording
       recognitionRef.current.stop();
       setIsRecording(false);
       
+      // Process the accumulated transcript
       if (transcript.trim()) {
         await processQuestion(transcript);
       }
     } else {
+      // Start new recording
       setIsRecording(true);
       setTranscript('');
       setResponse('');
@@ -207,9 +173,6 @@ const VoiceAssistant = () => {
       const aiResponse = data.choices[0].message.content;
       setResponse(aiResponse);
       setStatus('idle');
-      
-      // Automatically speak the response
-      speakResponse(aiResponse);
 
     } catch (err) {
       setStatus('error');
@@ -247,23 +210,6 @@ const VoiceAssistant = () => {
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
             )}
           </button>
-          
-          <button
-            onClick={repeatLastResponse}
-            disabled={!response || isSpeaking}
-            className={`p-4 rounded-full ${
-              response && !isSpeaking ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300'
-            } transition-colors duration-200`}
-            aria-label="Repeat last response"
-          >
-            <RepeatIcon className="w-6 h-6 text-white" />
-          </button>
-          
-          {isSpeaking && (
-            <div className="flex items-center">
-              <Volume2 className="w-6 h-6 text-green-500 animate-pulse" />
-            </div>
-          )}
         </div>
 
         <div className="space-y-4">
