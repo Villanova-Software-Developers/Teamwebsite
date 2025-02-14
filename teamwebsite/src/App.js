@@ -23,6 +23,7 @@ import TimeAvailabilityAdmin from './pages/admin/avail';
 import Star from './pages/star';
 import ActivityAndChatPage from './pages/s';
 import ResultsAnalysisPage from './pages/trick';
+import VoiceAssistant from './pages/voice';
 // Enhanced Protected Route Component
 //test
 //sd
@@ -133,6 +134,8 @@ function App() {
         <Route path="/register-member" element={<MemberRegistration />} /> 
         <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
         <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
+        <Route path="/voice" element={<VoiceAssistant />} /> {/* Add this route */}
+
     
 
 
