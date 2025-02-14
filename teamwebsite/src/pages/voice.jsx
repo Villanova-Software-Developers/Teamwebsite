@@ -46,7 +46,7 @@ const VoiceAssistant = () => {
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.5; // Faster speech rate
+    utterance.rate = 1; // Faster speech rate
     utterance.pitch = 1;
     
     utterance.onstart = () => setIsSpeaking(true);
