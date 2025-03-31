@@ -24,7 +24,7 @@ import Star from './pages/star';
 import ActivityAndChatPage from './pages/s';
 import ResultsAnalysisPage from './pages/trick';
 import VoiceAssistant from './pages/voice';
-// Enhanced Protected Route Component
+import Sign from './pages/sign';// Enhanced Protected Route Component
 //test
 //sd
 const ProtectedRoute = ({ children }) => {
@@ -135,7 +135,7 @@ function App() {
         <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
         <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
         <Route path="/voice" element={<VoiceAssistant />} /> {/* Add this route */}
-
+        <Route path="/sign" element={<Sign />} /> {/* Add this route */}
     
 
 

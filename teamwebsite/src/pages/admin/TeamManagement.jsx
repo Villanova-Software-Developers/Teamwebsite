@@ -321,6 +321,8 @@ const TeamManagement = () => {
                 >
                   <option value="CO_PRES">Co-President</option>
                   <option value="MEMBER">Member</option>
+                  <option value="Head of Frontend">Head of Frontend</option>
+
                   <option value="ADVISOR">Advisor</option>
                 </select>
               </div>
@@ -477,6 +479,8 @@ const TeamManagement = () => {
                       <option value="CO_PRES">Co-President</option>
                       <option value="MEMBER">Member</option>
                       <option value="ADVISOR">Advisor</option>
+                      <option value="Member">Head of Frontend</option>
+
                     </select>
                   </div>
 

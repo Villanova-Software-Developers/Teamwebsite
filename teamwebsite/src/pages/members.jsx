@@ -41,6 +41,7 @@ const LeadershipCard = ({ name, role, image, about, github, linkedin, email }) =
       <p className="text-blue-600 font-medium mb-4">
         {role === 'CO_PRES' ? 'Co-President' : 
          role === 'MEMBER' ? 'Member' : 
+         role === 'Head of Frontend' ? 'Head of Frontend' : 
          role === 'ADVISOR' ? 'Advisor' : role}
       </p>
       <p className="text-gray-600 mb-4">{about}</p>
@@ -75,6 +76,7 @@ const Member = ({ name, role, image, github, linkedin }) => (
       <p className="text-blue-600 font-medium mb-4">
         {role === 'CO_PRES' ? 'Co-President' : 
          role === 'MEMBER' ? 'Member' : 
+          role === 'Head of Frontend' ? 'Head of Frontend' :
          role === 'ADVISOR' ? 'Advisor' : role}
       </p>
       <div className="flex space-x-4">
