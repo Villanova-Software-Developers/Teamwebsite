@@ -13,6 +13,8 @@ import {
   History, Description, SwapHoriz, DoneAll, Warning
 } from '@mui/icons-material';
 
+
+
 // Custom color theme
 const colors = {
   primary: {
@@ -54,6 +56,7 @@ const colors = {
     secondary: '#666666',
   }
 };
+
 
 // Component to handle file dropzone with animation
 const SignatureDropzone = ({ onDrop, file, preview, canvasRef, onClear, disabled, label }) => {
@@ -196,15 +199,18 @@ const SignatureDropzone = ({ onDrop, file, preview, canvasRef, onClear, disabled
     </Card>
   );
 };
+
 function Sign() {
   // States
-  const [apiUrl, setApiUrl] = useState('https://23de-153-104-35-32.ngrok-free.app');
+  const [apiUrl, setApiUrl] = useState('http://127.0.0.1:5006');
   const [signature1, setSignature1] = useState(null);
   const [signature2, setSignature2] = useState(null);
   const [preview1, setPreview1] = useState(null);
-  const [preview2, setPreview2] = useState(null);
+  const [preview2, setPreview2] = useState(null); 
   const [threshold, setThreshold] = useState(0.10);
   const [verifying, setVerifying] = useState(false);
+
+  
   const [result, setResult] = useState(null);
   const [apiStatus, setApiStatus] = useState('checking');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });

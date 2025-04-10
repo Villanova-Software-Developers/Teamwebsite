@@ -25,6 +25,7 @@ import ActivityAndChatPage from './pages/s';
 import ResultsAnalysisPage from './pages/trick';
 import VoiceAssistant from './pages/voice';
 import Sign from './pages/sign';// Enhanced Protected Route Component
+import FinLitApp from './pages/finlit';
 //test
 //sd
 const ProtectedRoute = ({ children }) => {
@@ -136,6 +137,7 @@ function App() {
         <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
         <Route path="/voice" element={<VoiceAssistant />} /> {/* Add this route */}
         <Route path="/sign" element={<Sign />} /> {/* Add this route */}
+
     
 
 
@@ -147,6 +149,8 @@ function App() {
         <Route path="/s" element={<Star />} />
           <Route path="/ss" element={<ActivityAndChatPage />} />
           <Route path="/f" element={<ResultsAnalysisPage />} />
+          <Route path="/fin" element={<FinLitApp />} /> {/* Add this route */}
+
       </Route>
 
       {/* Auth Routes */}
