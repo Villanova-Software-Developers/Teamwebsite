@@ -95,7 +95,7 @@ const FinLitApp = () => {
           <div className="bg-emerald-500 text-white p-2 rounded-lg">
             <BookOpen size={20} />
           </div>
-          <h1 className="text-2xl font-bold text-blue-700">Fortuna</h1>
+          <h1 className="text-2xl font-bold text-blue-700">FinLit</h1>
         </div>
         <div className="flex items-center">
           <div className="flex items-center mr-6">
