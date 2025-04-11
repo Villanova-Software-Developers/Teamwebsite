@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Star, Award, Book, BookOpen, Home, Calendar, User, Brain, HelpCircle, Check, Lock, Flame, GraduationCap } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 const FinLitApp = () => {
+    // At the top of the file
+const userName = "Cornell Staeger";
+const companyLogoUrl = "/assets/company-logo.png"; // Update with your actual logo path
+
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [xpLevel, setXpLevel] = useState(45);
   const [streak, setStreak] = useState(7);
@@ -15,6 +19,7 @@ const FinLitApp = () => {
   });
   const [certificationPoints, setCertificationPoints] = useState(750);
   const [showCertTooltip, setShowCertTooltip] = useState(false);
+  const navigate = useNavigate();
   
   // Handle selecting an answer for challenges
   const handleAnswerSelect = (index) => {
@@ -91,31 +96,52 @@ const FinLitApp = () => {
     <div className="flex flex-col h-screen bg-blue-50">
       {/* Header */}
       <header className="bg-blue-100 p-4 flex justify-between items-center border-b border-blue-200">
-        <div className="flex items-center gap-2">
-          <div className="bg-emerald-500 text-white p-2 rounded-lg">
-            <BookOpen size={20} />
-          </div>
-          <h1 className="text-2xl font-bold text-blue-700">FinLit</h1>
+  {/* Left Side: App Logo and Title */}
+  <div className="flex items-center gap-2">
+    <div className="bg-emerald-500 text-white p-2 rounded-lg">
+      <BookOpen size={20} />
+    </div>
+    <h1 className="text-2xl font-bold text-blue-700">FinLit</h1>
+  </div>
+
+  {/* Right Side: User Info, PwC logo, Cert, and Logout */}
+  <div className="flex items-center gap-6">
+    {/* User Name */}
+    <span className="text-blue-800 font-semibold">Cornell Staeger</span>
+
+    {/* PwC Logo */}
+    <img
+      src="pwc.svg" // <-- Make sure this path is correct or replace with actual logo URL
+      alt="PwC Logo"
+      className="w-10 h-10 object-contain"
+    />
+
+    {/* Certificate Info */}
+    <div
+      className="relative"
+      onMouseEnter={() => setShowCertTooltip(true)}
+      onMouseLeave={() => setShowCertTooltip(false)}
+    >
+      <GraduationCap className="text-yellow-500 mr-2" size={24} />
+      {showCertTooltip && (
+        <div className="absolute -bottom-16 -left-16 bg-white p-3 rounded-md shadow-lg text-xs w-48 z-10">
+          <p className="font-bold mb-1">Financial Literacy Certificate</p>
+          <p className="text-gray-600">1000 points needed (250 to go)</p>
         </div>
-        <div className="flex items-center">
-          <div className="flex items-center mr-6">
-            <div className="relative" onMouseEnter={() => setShowCertTooltip(true)} onMouseLeave={() => setShowCertTooltip(false)}>
-              <GraduationCap className="text-yellow-500 mr-2" size={24} />
-              {showCertTooltip && (
-                <div className="absolute -bottom-16 -left-16 bg-white p-3 rounded-md shadow-lg text-xs w-48 z-10">
-                  <p className="font-bold mb-1">Financial Literacy Certificate</p>
-                  <p className="text-gray-600">1000 points needed (250 to go)</p>
-                </div>
-              )}
-            </div>
-            <div className="text-sm">
-              <span className="font-bold">{certificationPoints}</span>
-              <span className="text-gray-500">/1000</span>
-            </div>
-          </div>
-          <button className="px-4 py-2 text-gray-600 rounded-md">Log out</button>
-        </div>
-      </header>
+      )}
+    </div>
+    <div className="text-sm">
+      <span className="font-bold">{certificationPoints}</span>
+      <span className="text-gray-500">/1000</span>
+    </div>
+
+    {/* Logout */}
+    <button className="px-4 py-2 text-gray-600 rounded-md hover:bg-gray-200 transition">
+      Log out
+    </button>
+  </div>
+</header>
+
       
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
@@ -135,11 +161,14 @@ const FinLitApp = () => {
             <span className="font-medium">Leaderboard</span>
           </div>
           
-          <div className="flex items-center gap-3 p-2 hover:bg-blue-500 rounded-md cursor-pointer">
-            <Brain size={24} />
-            <span className="font-medium">Learning Center</span>
-          </div>
-          
+          <div
+  className="flex items-center gap-3 p-2 hover:bg-blue-500 rounded-md cursor-pointer"
+  onClick={() => navigate('/game')}
+>
+  <Brain size={24} />
+  <span className="font-medium">Learning Center</span>
+</div>
+
           <div className="flex items-center gap-3 p-2 hover:bg-blue-500 rounded-md cursor-pointer">
             <Award size={24} />
             <span className="font-medium">Badges</span>

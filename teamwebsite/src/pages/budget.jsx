@@ -781,13 +781,13 @@ const BudgetGame = () => {
                   
                   {/* Expenses section */}
                   <div 
-                    className="border-2 border-dashed border-red-300 bg-gradient-to-br from-red-500 to-pink-500 bg-opacity-30 p-6 rounded-lg min-h-64 shadow-inner transition-all duration-300 hover:shadow-lg"
-                    onDragOver={(e) => e.preventDefault()}
+className="border-2 border-dashed border-purple-300 bg-gradient-to-br from-purple-400 to-pink-500 bg-opacity-40 p-6 rounded-lg min-h-64 shadow-inner transition-all duration-300 hover:shadow-lg"
+onDragOver={(e) => e.preventDefault()}
                     onDrop={handleDropExpense}
                   >
                     <div className="flex items-center mb-4">
                       <div className="w-10 h-10 rounded-full bg-red-400 flex items-center justify-center mr-3 shadow-lg">
-                        <ShoppingCart className="text-red-900" size={20} />
+                        <ShoppingCart className="text-white" size={20} />
                       </div>
                       <h3 className="font-bold text-xl text-white drop-shadow-md">Expenses</h3>
                     </div>
@@ -801,23 +801,23 @@ const BudgetGame = () => {
                             </div>
                             <span className="font-semibold text-white">{item.name}</span>
                           </div>
-                          <span className="font-bold text-red-300">${item.amount}</span>
+                          <span className="font-bold text-white">${item.amount}</span>
                         </div>
                       ))}
                     </div>
                     
                     <div className="mt-6 pt-6 border-t border-white border-opacity-20 flex justify-between">
                       <span className="font-semibold text-white">Total Expenses:</span>
-                      <span className="font-bold text-xl text-red-300">${totalExpenses}</span>
+                      <span className="font-bold text-xl text-white">${totalExpenses}</span>
                     </div>
                   </div>
                 </div>
                 
                 {/* Balance calculation */}
-                <div className={`p-6 rounded-lg mb-6 shadow-lg ${balance >= 0 ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-gradient-to-r from-red-500 to-pink-500'} transform transition-all duration-300 hover:scale-102 hover:shadow-xl`}>
+                <div className={`p-6 rounded-lg mb-6 shadow-lg ${balance >= 0 ? 'bg-gradient-to-r from-green-500 to-blue-500' : 'bg-gradient-to-r from-purple-400 to-pink-500'} transform transition-all duration-300 hover:scale-102 hover:shadow-xl`}>
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-white text-lg">Balance (Income - Expenses):</span>
-                    <span className={`font-bold text-2xl text-white`}>
+                    <span className={`font-bold text-xl text-white`}>
                       ${balance}
                     </span>
                   </div>
