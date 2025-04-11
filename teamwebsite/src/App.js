@@ -26,7 +26,8 @@ import ResultsAnalysisPage from './pages/trick';
 import VoiceAssistant from './pages/voice';
 import Sign from './pages/sign';// Enhanced Protected Route Component
 import FinLitApp from './pages/finlit';
-//test
+import FinancialLiteracyGameMap from './pages/gamify';
+import BudgetGame from './pages/budget';//test
 //sd
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -150,6 +151,10 @@ function App() {
           <Route path="/ss" element={<ActivityAndChatPage />} />
           <Route path="/f" element={<ResultsAnalysisPage />} />
           <Route path="/fin" element={<FinLitApp />} /> {/* Add this route */}
+          <Route path="/game" element={<FinancialLiteracyGameMap />} /> {/* Add this route */}
+          <Route path="/bud" element={<BudgetGame />} /> {/* Add this route */}
+
+
 
       </Route>
 
