@@ -3,10 +3,14 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 
+// In component
+
 const FinancialRoadmap = () => {
+    const { scrollYProgress } = useScroll();
+const pathDrawProgress = useTransform(scrollYProgress, [0, 2], [0.6, 2]); 
+
   const [visibleModules, setVisibleModules] = useState(3);
   const scrollRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: scrollRef });
   const navigate = useNavigate();
 
   // All modules in one continuous journey
@@ -261,25 +265,21 @@ const FinancialRoadmap = () => {
       {/* Road Map with Curved Path */}
       <div className="max-w-4xl mx-auto relative mb-16 pb-40">
         {/* Path visual - Creating a curved, winding path */}
-        <svg className="absolute inset-0 w-full h-full z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path 
-            d="M50,0 Q60,20 40,40 Q20,60 60,80 Q100,100 50,120 Q0,140 50,160 Q100,180 50,200" 
-            stroke="#4299e1" 
-            strokeWidth="2" 
-            fill="none" 
-            strokeDasharray="5,5"
-            className="opacity-70"
-          />
-          <motion.path 
-            d="M50,0 Q60,20 40,40 Q20,60 60,80 Q100,100 50,120 Q0,140 50,160 Q100,180 50,200" 
-            stroke="#3182ce" 
-            strokeWidth="3" 
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: visibleModules / allModules.length }}
-            transition={{ duration: 1, ease: "easeInOut" }}
-          />
-        </svg>
+        <svg
+  className="absolute top-0 left-0 w-full"
+  height="1000"
+  viewBox="0 0 100 200"
+  preserveAspectRatio="none"
+>
+<motion.path
+  d="M50,0 Q60,20 40,40 Q20,60 60,80 Q100,100 50,120 Q0,140 50,160 Q100,180 50,200"
+  stroke="#3182ce"
+  strokeWidth="3"
+  fill="none"
+  style={{ pathLength: pathDrawProgress }}
+/>
+
+</svg>
 
         {/* Modules */}
         <div className="relative z-10">
@@ -301,15 +301,14 @@ const FinancialRoadmap = () => {
                   fill="none" 
                   className="opacity-70"
                 />
-                <motion.path 
-                  d={module.position === 'left' ? "M0,20 C30,20 30,0 60,0" : "M60,20 C30,20 30,0 0,0"} 
-                  stroke="#3182ce" 
-                  strokeWidth="3" 
-                  fill="none"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: module.status === "Locked" ? 0 : 1 }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                />
+            <motion.path
+  d="M50,0 Q60,20 40,40 Q20,60 60,80 Q100,100 50,120 Q0,140 50,160 Q100,180 50,200"
+  stroke="#3182ce"
+  strokeWidth="3"
+  fill="none"
+  style={{ pathLength: pathDrawProgress }}
+/>
+
               </svg>
               
               {/* Module card */}
