@@ -13,7 +13,7 @@ const Search = () => {
   // Format should be: 'https://your-ngrok-url.ngrok.io/api'
   
   // REPLACE THE ABOVE URL WITH YOUR NGROK URL WHEN DEPLOYED
-   const API_URL = 'https://97a7-153-104-35-114.ngrok-free.app/api';
+   const API_URL = 'https://kattis-search-913142512012.us-central1.run.app/api';
 
   // Check index status on component mount
   useEffect(() => {
