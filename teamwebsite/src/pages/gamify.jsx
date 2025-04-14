@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const FinancialRoadmap = () => {
     const { scrollYProgress } = useScroll();
-const pathDrawProgress = useTransform(scrollYProgress, [0, 2], [0.6, 2]); 
+const pathDrawProgress = useTransform(scrollYProgress, [0, 2], [0.4, 2]); 
 
   const [visibleModules, setVisibleModules] = useState(3);
   const scrollRef = useRef(null);

@@ -28,6 +28,7 @@ import Sign from './pages/sign';// Enhanced Protected Route Component
 import FinLitApp from './pages/finlit';
 import FinancialLiteracyGameMap from './pages/gamify';
 import BudgetGame from './pages/budget';//test
+import Search from './pages/search';
 //sd
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -138,6 +139,9 @@ function App() {
         <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
         <Route path="/voice" element={<VoiceAssistant />} /> {/* Add this route */}
         <Route path="/sign" element={<Sign />} /> {/* Add this route */}
+        <Route path="/search" element={<Search />} /> {/* Add this route */}
+
+
 
     
 
