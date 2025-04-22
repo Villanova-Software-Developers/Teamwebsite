@@ -79,26 +79,6 @@ const FoodWasteDashboard = () => {
     const interestLevels = ["Not interested", "Somewhat Interested", "Interested", "Very Interested"];
     const frequencyLevels = ["Not at All", "Once per Semester", "Once per Month", "2-3 Times per Month", "Once per Week", "Multiple Times per Week"];
     
-    // Process education and status data
-    const educationCounts = {};
-    const statusCounts = {};
-    rawData.forEach(entry => {
-      educationCounts[entry.Education_Level] = (educationCounts[entry.Education_Level] || 0) + 1;
-      statusCounts[entry.Student_Status] = (statusCounts[entry.Student_Status] || 0) + 1;
-    });
-    
-    // Process interest data
-    const interestCounts = {};
-    rawData.forEach(entry => {
-      interestCounts[entry.Interest_In_Org] = (interestCounts[entry.Interest_In_Org] || 0) + 1;
-    });
-    
-    // Process volunteer frequency data
-    const volunteerCounts = {};
-    rawData.forEach(entry => {
-      volunteerCounts[entry.Volunteer_Frequency] = (volunteerCounts[entry.Volunteer_Frequency] || 0) + 1;
-    });
-    
     // Process perception data
     const wasteCounts = {
       "Waste_US_Problem": {},
@@ -114,6 +94,21 @@ const FoodWasteDashboard = () => {
       }
     });
     
+    // Process interest data
+    const interestCounts = {
+      "Not Interested": 0,
+      "Interested": 0
+    };
+    
+    rawData.forEach(entry => {
+      if (entry.Interest_In_Org === "Not interested") {
+        interestCounts["Not Interested"]++;
+      } else {
+        // Combine "Somewhat Interested", "Interested", "Very Interested"
+        interestCounts["Interested"]++;
+      }
+    });
+    
     // Process motivation data
     const motivationCounts = {};
     rawData.forEach(entry => {
@@ -121,66 +116,131 @@ const FoodWasteDashboard = () => {
       motivationCounts[motivation] = (motivationCounts[motivation] || 0) + 1;
     });
     
-    // Process education-interest data
-    const educationInterestData = {};
+    // Process volunteering frequency data - group into low and high frequency
+    const volunteerCounts = {
+      "Low Frequency": 0, // Not at All, Once per Semester
+      "High Frequency": 0  // Monthly or more often
+    };
+    
     rawData.forEach(entry => {
-      const education = entry.Education_Level;
-      const interest = entry.Interest_In_Org;
-      
-      if (!educationInterestData[education]) {
-        educationInterestData[education] = {};
+      const frequency = entry.Volunteer_Frequency;
+      if (frequency === "Not at All" || frequency === "Once per Semester") {
+        volunteerCounts["Low Frequency"]++;
+      } else {
+        volunteerCounts["High Frequency"]++;
       }
-      
-      educationInterestData[education][interest] = (educationInterestData[education][interest] || 0) + 1;
     });
     
-    // Format data for charts
+    // Convert raw counts to percentages and grouped data
     
-    // 1. Waste US Problem
-    const wasteUSProblemData = agreementLevels.map(level => ({
-      name: level,
-      value: wasteCounts["Waste_US_Problem"][level] || 0
-    }));
+    // 1. Waste US Problem: Agree vs Disagree
+    const totalWasteUS = Object.values(wasteCounts["Waste_US_Problem"]).reduce((sum, count) => sum + count, 0);
+    const wasteUSAgree = (wasteCounts["Waste_US_Problem"]["Somewhat agree"] || 0) + 
+                         (wasteCounts["Waste_US_Problem"]["Strongly agree"] || 0);
+    const wasteUSDisagree = (wasteCounts["Waste_US_Problem"]["Strongly disagree"] || 0) + 
+                            (wasteCounts["Waste_US_Problem"]["Somewhat disagree"] || 0);
     
-    // 2. VU Dining Waste
-    const vuDiningWasteData = agreementLevels.map(level => ({
-      name: level,
-      value: wasteCounts["VU_Dining_Waste"][level] || 0
-    }));
+    const wasteUSProblemData = [
+      {
+        name: "Agree",
+        value: (wasteUSAgree / totalWasteUS) * 100,
+        count: wasteUSAgree
+      },
+      {
+        name: "Disagree",
+        value: (wasteUSDisagree / totalWasteUS) * 100,
+        count: wasteUSDisagree
+      }
+    ];
     
-    // 3. Interest in Organization
-    const interestData = interestLevels.map(level => ({
-      name: level,
-      value: interestCounts[level] || 0
-    }));
+    // 2. VU Dining Waste: Agree vs Disagree
+    const totalVUDining = Object.values(wasteCounts["VU_Dining_Waste"]).reduce((sum, count) => sum + count, 0);
+    const vuDiningAgree = (wasteCounts["VU_Dining_Waste"]["Somewhat agree"] || 0) + 
+                          (wasteCounts["VU_Dining_Waste"]["Strongly agree"] || 0);
+    const vuDiningDisagree = (wasteCounts["VU_Dining_Waste"]["Strongly disagree"] || 0) + 
+                             (wasteCounts["VU_Dining_Waste"]["Somewhat disagree"] || 0);
     
-    // 4. Volunteer Frequency
-    const volunteerData = frequencyLevels.map(level => ({
-      name: level,
-      value: volunteerCounts[level] || 0
-    }));
+    const vuDiningWasteData = [
+      {
+        name: "Agree",
+        value: (vuDiningAgree / totalVUDining) * 100,
+        count: vuDiningAgree
+      },
+      {
+        name: "Disagree",
+        value: (vuDiningDisagree / totalVUDining) * 100,
+        count: vuDiningDisagree
+      }
+    ];
     
-    // 5. Self Waste vs Portion Size
-    const selfWasteData = agreementLevels.map(level => ({
-      name: level,
-      'Self Waste': wasteCounts["Self_Waste"][level] || 0,
-      'Portion Size Too Large': wasteCounts["Portion_Size_Too_Large"][level] || 0
-    }));
+    // 3. Interest in Organization: Interested vs Not Interested
+    const totalInterest = Object.values(interestCounts).reduce((sum, count) => sum + count, 0);
+    const interestData = [
+      {
+        name: "Interested",
+        value: (interestCounts["Interested"] / totalInterest) * 100,
+        count: interestCounts["Interested"]
+      },
+      {
+        name: "Not Interested",
+        value: (interestCounts["Not Interested"] / totalInterest) * 100,
+        count: interestCounts["Not Interested"]
+      }
+    ];
+    
+    // 4. Volunteer Frequency: High vs Low
+    const totalVolunteer = Object.values(volunteerCounts).reduce((sum, count) => sum + count, 0);
+    const volunteerData = [
+      {
+        name: "High Frequency",
+        value: (volunteerCounts["High Frequency"] / totalVolunteer) * 100,
+        count: volunteerCounts["High Frequency"]
+      },
+      {
+        name: "Low Frequency",
+        value: (volunteerCounts["Low Frequency"] / totalVolunteer) * 100,
+        count: volunteerCounts["Low Frequency"]
+      }
+    ];
+    
+    // 5. Self Waste vs Portion Size: Convert to grouped data (Agree vs Disagree)
+    const totalSelfWaste = Object.values(wasteCounts["Self_Waste"]).reduce((sum, count) => sum + count, 0);
+    const totalPortionSize = Object.values(wasteCounts["Portion_Size_Too_Large"]).reduce((sum, count) => sum + count, 0);
+    
+    const selfWasteAgree = (wasteCounts["Self_Waste"]["Somewhat agree"] || 0) + 
+                          (wasteCounts["Self_Waste"]["Strongly agree"] || 0);
+    const selfWasteDisagree = (wasteCounts["Self_Waste"]["Strongly disagree"] || 0) + 
+                             (wasteCounts["Self_Waste"]["Somewhat disagree"] || 0);
+                             
+    const portionSizeAgree = (wasteCounts["Portion_Size_Too_Large"]["Somewhat agree"] || 0) + 
+                           (wasteCounts["Portion_Size_Too_Large"]["Strongly agree"] || 0);
+    const portionSizeDisagree = (wasteCounts["Portion_Size_Too_Large"]["Strongly disagree"] || 0) + 
+                              (wasteCounts["Portion_Size_Too_Large"]["Somewhat disagree"] || 0);
+    
+    const selfWasteData = [
+      {
+        name: "Agree",
+        "Self Waste": (selfWasteAgree / totalSelfWaste) * 100,
+        "Portion Size Too Large": (portionSizeAgree / totalPortionSize) * 100,
+        "Self Waste Count": selfWasteAgree,
+        "Portion Size Count": portionSizeAgree
+      },
+      {
+        name: "Disagree",
+        "Self Waste": (selfWasteDisagree / totalSelfWaste) * 100,
+        "Portion Size Too Large": (portionSizeDisagree / totalPortionSize) * 100,
+        "Self Waste Count": selfWasteDisagree,
+        "Portion Size Count": portionSizeDisagree
+      }
+    ];
     
     // 6. Motivation by Service Requirement
+    const totalMotivation = Object.values(motivationCounts).reduce((sum, count) => sum + count, 0);
     const motivationData = Object.entries(motivationCounts).map(([key, value]) => ({
       name: key,
-      value: value
+      value: (value / totalMotivation) * 100,
+      count: value
     }));
-    
-    // 7. Education and Interest
-    const educationInterestChartData = Object.keys(educationInterestData).map(edu => {
-      const result = { name: edu };
-      interestLevels.forEach(interest => {
-        result[interest] = educationInterestData[edu][interest] || 0;
-      });
-      return result;
-    });
     
     setData({
       wasteUSProblemData,
@@ -189,10 +249,31 @@ const FoodWasteDashboard = () => {
       volunteerData,
       selfWasteData,
       motivationData,
-      educationInterestChartData
+      totalResponses: totalWasteUS
     });
     
     setLoading(false);
+  };
+  
+  // Custom tooltip to show both percentage and count
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 shadow-md rounded">
+          <p className="font-semibold">{`${label}`}</p>
+          {payload.map((entry, index) => {
+            const dataKey = entry.dataKey === "value" ? entry.name : entry.dataKey;
+            const count = entry.payload[dataKey === "value" ? "count" : `${dataKey} Count`];
+            return (
+              <p key={`item-${index}`} style={{ color: entry.color }}>
+                {`${dataKey === "value" ? "" : dataKey + ": "}${entry.value.toFixed(1)}% (${count} responses)`}
+              </p>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
   };
   
   if (loading) {
@@ -207,7 +288,7 @@ const FoodWasteDashboard = () => {
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Chart 1: Is food waste a problem in the US? */}
+        {/* Chart 1: Is food waste a problem in the US? - Pie */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Is food waste a problem in the US?</h2>
@@ -220,23 +301,62 @@ const FoodWasteDashboard = () => {
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
+              <PieChart id="chart-waste-us-problem">
+                <Pie
+                  data={data.wasteUSProblemData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {data.wasteUSProblemData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#8884d8' : '#ff8042'} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend layout="vertical" verticalAlign="middle" align="right" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Chart 1B: Is food waste a problem in the US? - Bar */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Is food waste a problem in the US? (Bar)</h2>
+            <button 
+              className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1 rounded text-sm hover:from-purple-600 hover:to-indigo-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-waste-us-problem-bar', 'waste-us-problem-bar.png')}
+            >
+              Download
+            </button>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                id="chart-waste-us-problem"
+                id="chart-waste-us-problem-bar"
                 data={data.wasteUSProblemData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 90 }}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={90} interval={0} />
-                <YAxis />
-                <Tooltip />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Bar dataKey="value" name="Number of Responses" fill="#8884d8" />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar dataKey="value" name="Percentage" fill="#8884d8">
+                  {data.wasteUSProblemData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#8884d8' : '#ff8042'} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Chart 2: Is food waste a problem in VU dining? */}
+        {/* Chart 2: Is food waste a problem in VU dining? - Pie */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Is food waste a problem in VU dining?</h2>
@@ -249,28 +369,67 @@ const FoodWasteDashboard = () => {
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
+              <PieChart id="chart-vu-dining-waste">
+                <Pie
+                  data={data.vuDiningWasteData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={100}
+                  fill="#82ca9d"
+                  dataKey="value"
+                >
+                  {data.vuDiningWasteData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#82ca9d' : '#ff8042'} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend layout="vertical" verticalAlign="middle" align="right" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Chart 2B: Is food waste a problem in VU dining? - Bar */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Is food waste a problem in VU dining? (Bar)</h2>
+            <button 
+              className="bg-gradient-to-r from-teal-500 to-green-600 text-white px-3 py-1 rounded text-sm hover:from-teal-600 hover:to-green-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-vu-dining-waste-bar', 'vu-dining-waste-bar.png')}
+            >
+              Download
+            </button>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                id="chart-vu-dining-waste"
+                id="chart-vu-dining-waste-bar"
                 data={data.vuDiningWasteData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 90 }}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={90} interval={0} />
-                <YAxis />
-                <Tooltip />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Bar dataKey="value" name="Number of Responses" fill="#82ca9d" />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar dataKey="value" name="Percentage" fill="#82ca9d">
+                  {data.vuDiningWasteData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#82ca9d' : '#ff8042'} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Chart 3: Interest in Organization */}
+        {/* Chart 3: Interest in Organization - Pie */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Interest in Food Waste Organization</h2>
             <button 
-              className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded text-sm hover:from-blue-600 hover:to-indigo-700 shadow-md transition-all duration-300"
               onClick={() => downloadChart('chart-interest', 'interest-in-org.png')}
             >
               Download
@@ -290,23 +449,23 @@ const FoodWasteDashboard = () => {
                   dataKey="value"
                 >
                   {data.interestData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#8884d8' : '#ff8042'} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend layout="vertical" verticalAlign="middle" align="right" />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Chart 4: Volunteer Frequency */}
+        {/* Chart 3B: Interest in Organization - Bar */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Interest in Food Waste Organization (Bar)</h2>
             <button 
-              className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
-              onClick={() => downloadChart('chart-volunteer', 'volunteer-frequency.png')}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded text-sm hover:from-blue-600 hover:to-indigo-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-interest-bar', 'interest-in-org-bar.png')}
             >
               Download
             </button>
@@ -314,16 +473,88 @@ const FoodWasteDashboard = () => {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                id="chart-volunteer"
-                data={data.volunteerData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 90 }}
+                id="chart-interest-bar"
+                data={data.interestData}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={90} interval={0} />
-                <YAxis />
-                <Tooltip />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar dataKey="value" name="Number of Responses" fill="#ffc658" />
+                <Bar dataKey="value" name="Percentage" fill="#8884d8">
+                  {data.interestData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#8884d8' : '#ff8042'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Chart 4: Volunteer Frequency - Pie */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference</h2>
+            <button 
+              className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-3 py-1 rounded text-sm hover:from-yellow-600 hover:to-orange-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-volunteer', 'volunteer-frequency.png')}
+            >
+              Download
+            </button>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart id="chart-volunteer">
+                <Pie
+                  data={data.volunteerData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={100}
+                  fill="#ffc658"
+                  dataKey="value"
+                >
+                  {data.volunteerData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#ffc658' : '#ff8042'} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend layout="vertical" verticalAlign="middle" align="right" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Chart 4B: Volunteer Frequency - Bar */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference (Bar)</h2>
+            <button 
+              className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-3 py-1 rounded text-sm hover:from-yellow-600 hover:to-orange-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-volunteer-bar', 'volunteer-frequency-bar.png')}
+            >
+              Download
+            </button>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                id="chart-volunteer-bar"
+                data={data.volunteerData}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar dataKey="value" name="Percentage" fill="#ffc658">
+                  {data.volunteerData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#ffc658' : '#ff8042'} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -334,7 +565,7 @@ const FoodWasteDashboard = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Self Waste vs Portion Size Too Large</h2>
             <button 
-              className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
+              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-3 py-1 rounded text-sm hover:from-pink-600 hover:to-purple-700 shadow-md transition-all duration-300"
               onClick={() => downloadChart('chart-self-waste', 'self-waste-vs-portion.png')}
             >
               Download
@@ -345,13 +576,14 @@ const FoodWasteDashboard = () => {
               <BarChart
                 id="chart-self-waste"
                 data={data.selfWasteData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 90 }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                layout="vertical"
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" height={90} interval={0} />
-                <YAxis />
-                <Tooltip />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
+                <XAxis type="number" tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <YAxis dataKey="name" type="category" width={80} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ paddingTop: "10px" }} />
                 <Bar dataKey="Self Waste" fill="#8884d8" />
                 <Bar dataKey="Portion Size Too Large" fill="#82ca9d" />
               </BarChart>
@@ -359,12 +591,42 @@ const FoodWasteDashboard = () => {
           </div>
         </div>
         
-        {/* Chart 6: Motivation by Service Requirement */}
+        {/* Chart 5B: Self Waste vs Portion Size - Grouped */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Self Waste vs Portion Size (Grouped)</h2>
+            <button 
+              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-3 py-1 rounded text-sm hover:from-pink-600 hover:to-purple-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-self-waste-grouped', 'self-waste-vs-portion-grouped.png')}
+            >
+              Download
+            </button>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                id="chart-self-waste-grouped"
+                data={data.selfWasteData}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar dataKey="Self Waste" fill="#8884d8" />
+                <Bar dataKey="Portion Size Too Large" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Chart 6: Motivation by Service Requirement - Pie */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Motivated by Service Requirement</h2>
             <button 
-              className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
+              className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-3 py-1 rounded text-sm hover:from-green-600 hover:to-teal-700 shadow-md transition-all duration-300"
               onClick={() => downloadChart('chart-motivation', 'motivation-service.png')}
             >
               Download
@@ -387,20 +649,20 @@ const FoodWasteDashboard = () => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value, name, props) => [value, props.payload.name]} />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend layout="vertical" verticalAlign="middle" align="right" />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Chart 7: Education Level vs Interest */}
-        <div className="bg-white p-6 rounded-lg shadow-md col-span-1 md:col-span-2">
+        {/* Chart 6B: Motivation by Service Requirement - Bar */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Education Level vs Interest</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Motivated by Service Requirement (Bar)</h2>
             <button 
-              className="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
-              onClick={() => downloadChart('chart-education-interest', 'education-vs-interest.png')}
+              className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-3 py-1 rounded text-sm hover:from-green-600 hover:to-teal-700 shadow-md transition-all duration-300"
+              onClick={() => downloadChart('chart-motivation-bar', 'motivation-service-bar.png')}
             >
               Download
             </button>
@@ -408,28 +670,31 @@ const FoodWasteDashboard = () => {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                id="chart-education-interest"
-                data={data.educationInterestChartData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 30 }}
+                id="chart-motivation-bar"
+                data={data.motivationData}
+                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" interval={0} />
-                <YAxis />
-                <Tooltip />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar dataKey="Not interested" stackId="a" fill="#8884d8" />
-                <Bar dataKey="Somewhat Interested" stackId="a" fill="#82ca9d" />
-                <Bar dataKey="Interested" stackId="a" fill="#ffc658" />
-                <Bar dataKey="Very Interested" stackId="a" fill="#ff8042" />
+                <Bar dataKey="value" name="Percentage" fill="#82ca9d">
+                  {data.motivationData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
+        
+     
       
       <div className="mt-6 text-center">
         <p className="text-gray-600 text-sm">
-          Data source: Food Donation Survey | Total responses: {data.wasteUSProblemData.reduce((sum, item) => sum + item.value, 0)}
+          Data source: Food Donation Survey | Total responses: {data.totalResponses}
         </p>
       </div>
     </div>
