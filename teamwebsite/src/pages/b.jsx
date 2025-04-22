@@ -72,7 +72,7 @@ const FoodWasteChart = () => {
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Villanova University Partnership</h3>
                 <p className="text-gray-700 mb-4">
-                  In our interviews with Villanova Dining Services, we found enthusiastic support for our initiative. Their team shared that approximately 150 pounds of quality food goes to waste each day across campus dining facilities.
+                  In our interviews with Villanova Dining Services, we found enthusiastic support for our initiative. Their team shared that a lot of quality food goes to waste each day across campus dining facilities.
                 </p>
                 <blockquote className="border-l-4 border-emerald-500 pl-4 italic text-gray-600 mb-4">
                   "We want to have student groups or campus offices come into the dining hall and volunteer to plate the food, instead of adding another responsibility for our staff who are already working early mornings or late nights"
