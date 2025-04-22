@@ -289,6 +289,7 @@ const FoodWasteDashboard = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
      {/* Chart 1: Food Waste Perception - Horizontal Bar Chart */}
+{/* Chart 1: Food Waste Perception - Horizontal Bar Chart */}
 <div className="bg-white p-6 rounded-lg shadow-md">
   <div className="flex justify-between items-center mb-4">
     <h2 className="text-xl font-semibold text-gray-800">Student Perspectives on Food Waste</h2>
@@ -335,7 +336,7 @@ const FoodWasteDashboard = () => {
             total: 65
           }
         ]}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 5, right: 50, left: 20, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis type="number" />
@@ -343,16 +344,31 @@ const FoodWasteDashboard = () => {
         <Tooltip />
         <Legend />
         <Bar dataKey="agree" name="Agree" fill="#4f7cf9" stackId="a">
-          {/* Add value labels inside the bars */}
           <LabelList dataKey="agree" position="center" fill="white" />
         </Bar>
         <Bar dataKey="disagree" name="Disagree" fill="#a855f7" stackId="a">
           <LabelList dataKey="disagree" position="center" fill="white" />
         </Bar>
+        <Bar dataKey="total" name="Total" fill="transparent">
+          <LabelList dataKey="total" position="right" fill="gray" />
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   </div>
- 
+  <div className="flex justify-center mt-4 space-x-8">
+    <div className="flex items-center">
+      <div className="w-4 h-4 bg-blue-500 mr-2"></div>
+      <span className="text-blue-700 font-medium">Agree</span>
+    </div>
+    <div className="flex items-center">
+      <div className="w-4 h-4 bg-purple-500 mr-2"></div>
+      <span className="text-purple-700 font-medium">Disagree</span>
+    </div>
+    <div className="flex items-center">
+      <div className="w-4 h-4 border border-gray-500 bg-white mr-2"></div>
+      <span className="text-gray-700 font-medium">Total</span>
+    </div>
+  </div>
 </div>
         
         {/* Chart 1B: Is food waste a problem in the US? - Bar */}

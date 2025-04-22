@@ -30,6 +30,7 @@ import FinancialLiteracyGameMap from './pages/gamify';
 import BudgetGame from './pages/budget';//test
 import Search from './pages/search';
 import FoodWasteDashboard from './pages/proj';
+import FoodWasteChart from './pages/b';
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -141,6 +142,8 @@ function App() {
         <Route path="/sign" element={<Sign />} /> {/* Add this route */}
         <Route path="/search" element={<Search />} /> {/* Add this route */}
         <Route path="/data" element={<FoodWasteDashboard />} /> {/* Add this route */}
+        <Route path="/dat" element={<FoodWasteChart />} /> {/* Add this route */}
+
 
 
 
