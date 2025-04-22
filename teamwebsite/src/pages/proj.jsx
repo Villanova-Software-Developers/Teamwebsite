@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, ComposedChart, Area
+  PolarAngleAxis, PolarRadiusAxis, ComposedChart, Area, LabelList
 } from 'recharts';
 
 // Color palette for charts
@@ -288,40 +288,72 @@ const FoodWasteDashboard = () => {
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Chart 1: Is food waste a problem in the US? - Pie */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Is food waste a problem in the US?</h2>
-            <button 
-              className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1 rounded text-sm hover:from-purple-600 hover:to-indigo-700 shadow-md transition-all duration-300"
-              onClick={() => downloadChart('chart-waste-us-problem', 'waste-us-problem.png')}
-            >
-              Download
-            </button>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart id="chart-waste-us-problem">
-                <Pie
-                  data={data.wasteUSProblemData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {data.wasteUSProblemData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#8884d8' : '#ff8042'} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend layout="vertical" verticalAlign="middle" align="right" />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+     {/* Chart 1: Food Waste Perception - Horizontal Bar Chart */}
+<div className="bg-white p-6 rounded-lg shadow-md">
+  <div className="flex justify-between items-center mb-4">
+    <h2 className="text-xl font-semibold text-gray-800">Student Perspectives on Food Waste</h2>
+    <button 
+      className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1 rounded text-sm hover:from-purple-600 hover:to-indigo-700 shadow-md transition-all duration-300"
+      onClick={() => downloadChart('chart-food-waste-perceptions', 'food-waste-perceptions.png')}
+    >
+      Download
+    </button>
+  </div>
+  <div className="h-96">
+    <ResponsiveContainer width="100%" height="100%" id="chart-food-waste-perceptions">
+      <BarChart
+        layout="vertical"
+        data={[
+          {
+            question: "Food waste is a problem in the United States",
+            agree: 63,
+            disagree: 2,
+            total: 65
+          },
+          {
+            question: "Food waste is a problem at Villanova",
+            agree: 56,
+            disagree: 9,
+            total: 65
+          },
+          {
+            question: "Portion sizes at dining halls are too large",
+            agree: 30,
+            disagree: 35,
+            total: 65
+          },
+          {
+            question: "I waste a lot of food each week",
+            agree: 22,
+            disagree: 43,
+            total: 65
+          },
+          {
+            question: "My peers and I throw away half of our portions",
+            agree: 19,
+            disagree: 46,
+            total: 65
+          }
+        ]}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis type="number" />
+        <YAxis dataKey="question" type="category" width={180} />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="agree" name="Agree" fill="#4f7cf9" stackId="a">
+          {/* Add value labels inside the bars */}
+          <LabelList dataKey="agree" position="center" fill="white" />
+        </Bar>
+        <Bar dataKey="disagree" name="Disagree" fill="#a855f7" stackId="a">
+          <LabelList dataKey="disagree" position="center" fill="white" />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+ 
+</div>
         
         {/* Chart 1B: Is food waste a problem in the US? - Bar */}
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -590,6 +622,7 @@ const FoodWasteDashboard = () => {
             >
               Download
             </button>
+            
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
