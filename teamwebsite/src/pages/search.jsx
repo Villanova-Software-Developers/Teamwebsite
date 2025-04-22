@@ -1,3 +1,6 @@
+// Updated Search component with proper API connection handling for ngrok
+
+// Updated frontend code to handle ngrok HTML responses
 import React, { useState, useEffect } from 'react';
 
 // Main Search App Component
@@ -10,49 +13,83 @@ const Search = () => {
   const [indexStatus, setIndexStatus] = useState({ status: 'loading' });
 
   // API URL - replace with your ngrok URL when available
-  // Format should be: 'https://your-ngrok-url.ngrok.io/api'
+  // IMPORTANT: Update this with your current ngrok URL
+  const API_BASE_URL = 'https://kattis-search-913142512012.us-central1.run.app';
   
-  // REPLACE THE ABOVE URL WITH YOUR NGROK URL WHEN DEPLOYED
-   const API_URL = 'https://kattis-search-913142512012.us-central1.run.app/api';
-
   // Check index status on component mount
   useEffect(() => {
     checkIndexStatus();
+    // Poll to check status every 10 seconds
+    const statusInterval = setInterval(checkIndexStatus, 10000);
+    return () => clearInterval(statusInterval);
   }, []);
 
-  // API function to check index status
+  // API function to check index status - FIXED VERSION
   const checkIndexStatus = async () => {
     try {
-      const response = await fetch(`${API_URL}/status`);
+      console.log('Checking status at:', `${API_BASE_URL}/api/status`);
       
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+      // Add the special ngrok header to bypass warning page
+      const response = await fetch(`${API_BASE_URL}/api/status`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'  // This is critical for ngrok
+        }
+      });
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Expected JSON response but got ${contentType}`);
       }
       
       const status = await response.json();
+      console.log('Received status:', status);
       setIndexStatus(status);
+      setError(null);
     } catch (err) {
-      setError("Failed to connect to the server. Please check if the backend is running.");
+      console.error("Error checking status:", err);
+      setError(`Failed to connect to the server: ${err.message}`);
       setIndexStatus({ status: 'error' });
     }
   };
 
-  // API function to search problems
+  // API function to search problems - FIXED VERSION
   const searchProblems = async (query, maxResults = 20) => {
     try {
-      const response = await fetch(`${API_URL}/search?query=${encodeURIComponent(query)}&max_results=${maxResults}`);
+      console.log('Searching at:', `${API_BASE_URL}/api/search`);
       
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+      // Proper URL parameter handling
+      const params = new URLSearchParams({
+        query: query,
+        max_results: maxResults
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/api/search?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'  // Critical for ngrok
+        }
+      });
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Expected JSON response but got ${contentType}`);
       }
       
       const data = await response.json();
+      console.log('Search results:', data);
       return data.results || [];
     } catch (error) {
       console.error('Error searching problems:', error);
       throw error;
     }
-  };
+    };
 
   // Handle search form submission
   const handleSearch = async (query) => {
@@ -111,6 +148,7 @@ const Search = () => {
       lineHeight: 1.6,
       color: '#333333',
     },
+    // ... rest of styles remain the same
     header: {
       marginBottom: '20px',
       textAlign: 'center',
@@ -349,6 +387,35 @@ const Search = () => {
     },
   };
 
+  // Add a connection status component to show detailed connection info
+  const ConnectionStatus = () => (
+    <div style={{
+      padding: '10px',
+      marginBottom: '10px',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '4px',
+      fontSize: '0.8rem',
+      color: '#666'
+    }}>
+      <div><strong>API URL:</strong> {API_BASE_URL}</div>
+      <div><strong>Status:</strong> {indexStatus.status}</div>
+      <div><strong>Problems:</strong> {indexStatus.indexed_problems || 'Unknown'}</div>
+      <button 
+        onClick={checkIndexStatus}
+        style={{
+          marginTop: '5px',
+          padding: '4px 8px',
+          backgroundColor: '#e0e0e0',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer'
+        }}
+      >
+        Refresh Connection
+      </button>
+    </div>
+  );
+
   // Generate status bar styling based on current status
   const getStatusBarStyle = () => {
     let baseStyle = {...styles.statusBar};
@@ -551,7 +618,12 @@ const Search = () => {
       </header>
 
       <main style={styles.main}>
-        <StatusBar />
+    
+        
+
+  
+        
+        {/* Add the new connection status component for debugging */}
         
         <SearchBar />
         

@@ -29,7 +29,7 @@ import FinLitApp from './pages/finlit';
 import FinancialLiteracyGameMap from './pages/gamify';
 import BudgetGame from './pages/budget';//test
 import Search from './pages/search';
-//sd
+import FoodWasteDashboard from './pages/proj';
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -140,6 +140,8 @@ function App() {
         <Route path="/voice" element={<VoiceAssistant />} /> {/* Add this route */}
         <Route path="/sign" element={<Sign />} /> {/* Add this route */}
         <Route path="/search" element={<Search />} /> {/* Add this route */}
+        <Route path="/data" element={<FoodWasteDashboard />} /> {/* Add this route */}
+
 
 
 
