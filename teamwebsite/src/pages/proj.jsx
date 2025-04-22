@@ -492,73 +492,93 @@ const FoodWasteDashboard = () => {
           </div>
         </div>
         
-        {/* Chart 4: Volunteer Frequency - Pie */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference</h2>
-            <button 
-              className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-3 py-1 rounded text-sm hover:from-yellow-600 hover:to-orange-700 shadow-md transition-all duration-300"
-              onClick={() => downloadChart('chart-volunteer', 'volunteer-frequency.png')}
-            >
-              Download
-            </button>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart id="chart-volunteer">
-                <Pie
-                  data={data.volunteerData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={100}
-                  fill="#ffc658"
-                  dataKey="value"
-                >
-                  {data.volunteerData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#ffc658' : '#ff8042'} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend layout="vertical" verticalAlign="middle" align="right" />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        
-        {/* Chart 4B: Volunteer Frequency - Bar */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference (Bar)</h2>
-            <button 
-              className="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-3 py-1 rounded text-sm hover:from-yellow-600 hover:to-orange-700 shadow-md transition-all duration-300"
-              onClick={() => downloadChart('chart-volunteer-bar', 'volunteer-frequency-bar.png')}
-            >
-              Download
-            </button>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                id="chart-volunteer-bar"
-                data={data.volunteerData}
-                margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-                <Bar dataKey="value" name="Percentage" fill="#ffc658">
-                  {data.volunteerData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#ffc658' : '#ff8042'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+       {/* Chart 4: Volunteer Frequency - Pie */}
+<div className="bg-white p-6 rounded-lg shadow-md">
+  <div className="flex justify-between items-center mb-4">
+    <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference</h2>
+    <button 
+      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded text-sm hover:from-blue-600 hover:to-purple-700 shadow-md transition-all duration-300"
+      onClick={() => downloadChart('chart-volunteer', 'volunteer-frequency.png')}
+    >
+      Download
+    </button>
+  </div>
+  <div className="h-80">
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart id="chart-volunteer">
+        <Pie
+          data={[
+            {
+              name: "Monthly or More Often",
+              value: data.volunteerData.find(d => d.name === "High Frequency")?.value || 0,
+              count: data.volunteerData.find(d => d.name === "High Frequency")?.count || 0
+            },
+            {
+              name: "Once per Semester or Less",
+              value: data.volunteerData.find(d => d.name === "Low Frequency")?.value || 0,
+              count: data.volunteerData.find(d => d.name === "Low Frequency")?.count || 0
+            }
+          ]}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={renderCustomizedLabel}
+          outerRadius={100}
+          fill="#8884d8"
+          dataKey="value"
+        >
+          <Cell fill="#6366f1" />
+          <Cell fill="#ec4899" />
+        </Pie>
+        <Tooltip content={<CustomTooltip />} />
+        <Legend layout="vertical" verticalAlign="middle" align="right" />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+{/* Chart 4B: Volunteer Frequency - Bar */}
+<div className="bg-white p-6 rounded-lg shadow-md">
+  <div className="flex justify-between items-center mb-4">
+    <h2 className="text-xl font-semibold text-gray-800">Volunteering Frequency Preference (Bar)</h2>
+    <button 
+      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded text-sm hover:from-blue-600 hover:to-purple-700 shadow-md transition-all duration-300"
+      onClick={() => downloadChart('chart-volunteer-bar', 'volunteer-frequency-bar.png')}
+    >
+      Download
+    </button>
+  </div>
+  <div className="h-80">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        id="chart-volunteer-bar"
+        data={[
+          {
+            name: "Monthly or More Often",
+            value: data.volunteerData.find(d => d.name === "High Frequency")?.value || 0,
+            count: data.volunteerData.find(d => d.name === "High Frequency")?.count || 0
+          },
+          {
+            name: "Once per Semester or Less",
+            value: data.volunteerData.find(d => d.name === "Low Frequency")?.value || 0,
+            count: data.volunteerData.find(d => d.name === "Low Frequency")?.count || 0
+          }
+        ]}
+        margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis tickFormatter={(value) => `${value}%`} domain={[0, 100]} />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend />
+        <Bar dataKey="value" name="Percentage">
+          <Cell fill="#6366f1" />
+          <Cell fill="#ec4899" />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
         
         {/* Chart 5: Self Waste vs Portion Size */}
         <div className="bg-white p-6 rounded-lg shadow-md">
