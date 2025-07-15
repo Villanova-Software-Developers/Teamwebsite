@@ -31,6 +31,8 @@ import BudgetGame from './pages/budget';//test
 import Search from './pages/search';
 import FoodWasteDashboard from './pages/proj';
 import FoodWasteChart from './pages/b';
+import CardiologyPSGenerator from './pages/ps';
+
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -144,14 +146,6 @@ function App() {
         <Route path="/data" element={<FoodWasteDashboard />} /> {/* Add this route */}
         <Route path="/dat" element={<FoodWasteChart />} /> {/* Add this route */}
 
-
-
-
-
-    
-
-
-
       </Route>
        {/* Route without navbar */}
        <Route element={<BasicLayout />}>
@@ -162,9 +156,7 @@ function App() {
           <Route path="/fin" element={<FinLitApp />} /> {/* Add this route */}
           <Route path="/game" element={<FinancialLiteracyGameMap />} /> {/* Add this route */}
           <Route path="/bud" element={<BudgetGame />} /> {/* Add this route */}
-
-
-
+          <Route path="/ps" element={<CardiologyPSGenerator />} /> {/* Add this route */}
       </Route>
 
       {/* Auth Routes */}
