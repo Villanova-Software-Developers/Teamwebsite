@@ -22,7 +22,6 @@ import TimeAvailability from './pages/teamavail';
 import TimeAvailabilityAdmin from './pages/admin/avail';
 import Star from './pages/star';
 import ActivityAndChatPage from './pages/s';
-import ResultsAnalysisPage from './pages/trick';
 import FinLitApp from './pages/finlit';
 import FinancialLiteracyGameMap from './pages/gamify';
 import BudgetGame from './pages/budget';//test
