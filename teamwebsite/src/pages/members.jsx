@@ -18,15 +18,14 @@ const SocialLink = ({ icon: Icon, href }) => (
   </motion.a>
 );
 
-// LeadershipCard and Member components remain unchanged
 const LeadershipCard = ({ name, role, image, about, github, linkedin, email }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    className="bg-white rounded-xl shadow-lg overflow-hidden"
+    className="bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col"
   >
-    <div className="p-6 flex flex-col items-center text-center">
+    <div className="p-6 flex flex-col items-center text-center flex-grow">
       <motion.div
         whileHover={{ scale: 1.05 }}
         className="mb-6"
@@ -44,8 +43,8 @@ const LeadershipCard = ({ name, role, image, about, github, linkedin, email }) =
          role === 'Head of Frontend' ? 'Head of Frontend' : 
          role === 'ADVISOR' ? 'Advisor' : role}
       </p>
-      <p className="text-gray-600 mb-4">{about}</p>
-      <div className="flex space-x-4">
+      <p className="text-gray-600 mb-4 flex-grow">{about}</p>
+      <div className="flex space-x-4 mt-auto">
         {github && <SocialLink icon={GithubIcon} href={github} />}
         {linkedin && <SocialLink icon={LinkedinIcon} href={linkedin} />}
         {email && <SocialLink icon={MailIcon} href={`mailto:${email}`} />}
@@ -54,14 +53,14 @@ const LeadershipCard = ({ name, role, image, about, github, linkedin, email }) =
   </motion.div>
 );
 
-const Member = ({ name, role, image, github, linkedin }) => (
+const Member = ({ name, role, image, about, github, linkedin }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    className="bg-white rounded-xl shadow-lg overflow-hidden"
+    className="bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col"
   >
-    <div className="p-6 flex flex-col items-center text-center">
+    <div className="p-6 flex flex-col items-center text-center flex-grow">
       <motion.div
         whileHover={{ scale: 1.05 }}
         className="mb-4"
@@ -79,7 +78,8 @@ const Member = ({ name, role, image, github, linkedin }) => (
           role === 'Head of Frontend' ? 'Head of Frontend' :
          role === 'ADVISOR' ? 'Advisor' : role}
       </p>
-      <div className="flex space-x-4">
+      {about && <p className="text-gray-600 mb-4 flex-grow">{about}</p>}
+      <div className="flex space-x-4 mt-auto">
         {github && <SocialLink icon={GithubIcon} href={github} />}
         {linkedin && <SocialLink icon={LinkedinIcon} href={linkedin} />}
       </div>

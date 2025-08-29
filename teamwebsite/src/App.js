@@ -23,16 +23,9 @@ import TimeAvailabilityAdmin from './pages/admin/avail';
 import Star from './pages/star';
 import ActivityAndChatPage from './pages/s';
 import ResultsAnalysisPage from './pages/trick';
-import VoiceAssistant from './pages/voice';
-import Sign from './pages/sign';// Enhanced Protected Route Component
 import FinLitApp from './pages/finlit';
 import FinancialLiteracyGameMap from './pages/gamify';
 import BudgetGame from './pages/budget';//test
-import Search from './pages/search';
-import FoodWasteDashboard from './pages/proj';
-import FoodWasteChart from './pages/b';
-import CardiologyPSGenerator from './pages/ps';
-
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -138,14 +131,8 @@ function App() {
         <Route path="/join-us" element={<JoinUs />} />
         <Route path="/submit-idea" element={<SubmitIdea />} />
         <Route path="/register-member" element={<MemberRegistration />} /> 
-        <Route path="/weekly-tasks" element={<WeeklyTasks />} /> {/* Add this route */}
-        <Route path="/availability" element={<TimeAvailability />} /> {/* Add this route */}
-        <Route path="/voice" element={<VoiceAssistant />} /> {/* Add this route */}
-        <Route path="/sign" element={<Sign />} /> {/* Add this route */}
-        <Route path="/search" element={<Search />} /> {/* Add this route */}
-        <Route path="/data" element={<FoodWasteDashboard />} /> {/* Add this route */}
-        <Route path="/dat" element={<FoodWasteChart />} /> {/* Add this route */}
-
+        <Route path="/weekly-tasks" element={<WeeklyTasks />} /> 
+        <Route path="/availability" element={<TimeAvailability />} /> 
       </Route>
        {/* Route without navbar */}
        <Route element={<BasicLayout />}>
@@ -153,10 +140,9 @@ function App() {
         <Route path="/s" element={<Star />} />
           <Route path="/ss" element={<ActivityAndChatPage />} />
           <Route path="/f" element={<ResultsAnalysisPage />} />
-          <Route path="/fin" element={<FinLitApp />} /> {/* Add this route */}
-          <Route path="/game" element={<FinancialLiteracyGameMap />} /> {/* Add this route */}
-          <Route path="/bud" element={<BudgetGame />} /> {/* Add this route */}
-          <Route path="/ps" element={<CardiologyPSGenerator />} /> {/* Add this route */}
+          <Route path="/fin" element={<FinLitApp />} /> 
+          <Route path="/game" element={<FinancialLiteracyGameMap />} /> 
+          <Route path="/bud" element={<BudgetGame />} /> 
       </Route>
 
       {/* Auth Routes */}
