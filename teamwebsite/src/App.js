@@ -138,7 +138,6 @@ function App() {
         <Route path="/medical-qa" element={<MedicalQA />} />
         <Route path="/s" element={<Star />} />
           <Route path="/ss" element={<ActivityAndChatPage />} />
-          <Route path="/f" element={<ResultsAnalysisPage />} />
           <Route path="/fin" element={<FinLitApp />} /> 
           <Route path="/game" element={<FinancialLiteracyGameMap />} /> 
           <Route path="/bud" element={<BudgetGame />} /> 
