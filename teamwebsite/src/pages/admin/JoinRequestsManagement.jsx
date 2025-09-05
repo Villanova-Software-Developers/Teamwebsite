@@ -90,6 +90,39 @@ const JoinRequestsManagement = () => {
     }
   };
 
+  const handleExportToCSV = () => {
+    const csvData = requests.map(request => ({
+      Name: request.name,
+      Email: request.email,
+      Status: request.status || 'PENDING',
+      Reason: request.reason?.replace(/\n/g, ' ') || '',
+      'Application Date': request.createdAt,
+      'Has Resume': request.resumeUrl ? 'Yes' : 'No',
+      'Resume URL': request.resumeUrl || ''
+    }));
+
+    const headers = Object.keys(csvData[0] || {});
+    const csvString = [
+      headers.join(','),
+      ...csvData.map(row => 
+        headers.map(header => {
+          const value = row[header] || '';
+          return `"${value.toString().replace(/"/g, '""')}"`;
+        }).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `join_requests_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredRequests = requests.filter(request => 
     request.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     request.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -107,15 +140,26 @@ const JoinRequestsManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Join Requests</h2>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search requests..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border rounded-lg w-64"
-          />
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={handleExportToCSV}
+            disabled={requests.length === 0}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Export all requests to CSV"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </button>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search requests..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border rounded-lg w-64"
+            />
+          </div>
         </div>
       </div>
 
