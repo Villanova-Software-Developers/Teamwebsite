@@ -355,13 +355,28 @@ const pathDrawProgress = useTransform(scrollYProgress, [0, 2], [0.4, 2]);
   <button 
     className="mt-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors w-full font-medium text-sm"
     onClick={() => {
-      if (module.title === "Budgeting Basics" && module.status === "Completed") {
-        navigate('/bud'); // assuming the route is /bud and linked to bud.jsx
+      // Route to appropriate gamified module based on title
+      switch(module.title) {
+        case "Budgeting Basics":
+          navigate('/bud');
+          break;
+        case "Savings & Emergency Fund":
+          navigate('/emergency-fund');
+          break;
+        case "Credit Score":
+          navigate('/credit-score');
+          break;
+        case "Investment":
+          navigate('/investment-banking');
+          break;
+        default:
+          // For other modules, keep existing behavior or show coming soon
+          alert('🎮 This gamified module is coming soon! Stay tuned for more interactive learning experiences!');
       }
     }}
   >
-    {module.status === 'Completed' ? 'Review Module' : 
-     module.status === 'In Progress' ? 'Continue Learning' : 'Start Module'}
+    {module.status === 'Completed' ? 'Play Again' : 
+     module.status === 'In Progress' ? 'Continue Adventure' : 'Start Adventure'}
   </button>
 )}
 
