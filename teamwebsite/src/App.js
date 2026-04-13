@@ -25,6 +25,10 @@ import ActivityAndChatPage from './pages/s';
 import FinLitApp from './pages/finlit';
 import FinancialLiteracyGameMap from './pages/gamify';
 import BudgetGame from './pages/budget';//test
+import InvestmentBankingGame from './pages/learning/InvestmentBankingGame';
+import CreditScoreGame from './pages/learning/CreditScoreGame';
+import EmergencyFundGame from './pages/learning/EmergencyFundGame';
+import Scanner from './pages/Scanner';
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -138,9 +142,13 @@ function App() {
         <Route path="/medical-qa" element={<MedicalQA />} />
         <Route path="/s" element={<Star />} />
           <Route path="/ss" element={<ActivityAndChatPage />} />
-          <Route path="/fin" element={<FinLitApp />} /> 
-          <Route path="/game" element={<FinancialLiteracyGameMap />} /> 
-          <Route path="/bud" element={<BudgetGame />} /> 
+          <Route path="/finlit" element={<FinLitApp />} />
+          <Route path="/game" element={<FinancialLiteracyGameMap />} />
+          <Route path="/bud" element={<BudgetGame />} />
+          <Route path="/investment-banking" element={<InvestmentBankingGame />} />
+          <Route path="/credit-score" element={<CreditScoreGame />} />
+          <Route path="/emergency-fund" element={<EmergencyFundGame />} />
+          <Route path="/scan" element={<Scanner />} />
       </Route>
 
       {/* Auth Routes */}
