@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 
-const MANUFACTURERS = ['Vadio', 'Crestron', 'Extron', 'Epson', 'Bi-amp'];
+const MANUFACTURERS = ['Vadio', 'Crestron', 'Extron', 'Epson', 'Biamp'];
 
 const LOCATIONS = [
   'Alumni Hall',
@@ -112,6 +112,12 @@ const Scanner = () => {
   const [records, setRecords] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
   const [lastRoomNumber, setLastRoomNumber] = useState('');
+  const [customManufacturers, setCustomManufacturers] = useState([]);
+  const [customLocations, setCustomLocations] = useState([]);
+  const [newManufacturer, setNewManufacturer] = useState('');
+  const [newLocation, setNewLocation] = useState('');
+  const [showManufacturerInput, setShowManufacturerInput] = useState(false);
+  const [showLocationInput, setShowLocationInput] = useState(false);
   const fileInputRef = useRef(null);
   const exportFileInputRef = useRef(null);
 
@@ -132,6 +138,14 @@ const Scanner = () => {
       setLastRoomNumber(savedRoom);
       setRoomNumber(savedRoom);
     }
+    const savedCustomManufacturers = localStorage.getItem('customManufacturers');
+    if (savedCustomManufacturers) {
+      setCustomManufacturers(JSON.parse(savedCustomManufacturers));
+    }
+    const savedCustomLocations = localStorage.getItem('customLocations');
+    if (savedCustomLocations) {
+      setCustomLocations(JSON.parse(savedCustomLocations));
+    }
   }, []);
 
   // Save records to localStorage whenever they change
@@ -144,6 +158,16 @@ const Scanner = () => {
     localStorage.setItem('lastRoomNumber', lastRoomNumber);
   }, [lastRoomNumber]);
 
+  // Save custom manufacturers to localStorage
+  useEffect(() => {
+    localStorage.setItem('customManufacturers', JSON.stringify(customManufacturers));
+  }, [customManufacturers]);
+
+  // Save custom locations to localStorage
+  useEffect(() => {
+    localStorage.setItem('customLocations', JSON.stringify(customLocations));
+  }, [customLocations]);
+
   const handleKeyDown = (e, nextRef, isLast = false) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -152,6 +176,40 @@ const Scanner = () => {
       } else if (nextRef?.current) {
         nextRef.current.focus();
       }
+    }
+  };
+
+  const addCustomManufacturer = () => {
+    const trimmed = newManufacturer.trim();
+    if (trimmed && !MANUFACTURERS.includes(trimmed) && !customManufacturers.includes(trimmed)) {
+      setCustomManufacturers((prev) => [...prev, trimmed]);
+      setManufacturer(trimmed);
+      setNewManufacturer('');
+      setShowManufacturerInput(false);
+    }
+  };
+
+  const addCustomLocation = () => {
+    const trimmed = newLocation.trim();
+    if (trimmed && !LOCATIONS.includes(trimmed) && !customLocations.includes(trimmed)) {
+      setCustomLocations((prev) => [...prev, trimmed]);
+      setLocation(trimmed);
+      setNewLocation('');
+      setShowLocationInput(false);
+    }
+  };
+
+  const removeCustomManufacturer = (value) => {
+    setCustomManufacturers((prev) => prev.filter((m) => m !== value));
+    if (manufacturer === value) {
+      setManufacturer('');
+    }
+  };
+
+  const removeCustomLocation = (value) => {
+    setCustomLocations((prev) => prev.filter((l) => l !== value));
+    if (location === value) {
+      setLocation('');
     }
   };
 
@@ -457,7 +515,7 @@ const Scanner = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold text-center text-emerald-400 mb-8">
-          UTS Asset Scanner
+           Asset Scanner
         </h1>
 
         {/* Scan Form Section */}
@@ -480,18 +538,88 @@ const Scanner = () => {
                 </span>
                 Manufacturer
               </label>
-              <select
-                value={manufacturer}
-                onChange={(e) => setManufacturer(e.target.value)}
-                className="w-full p-3 bg-slate-900/50 border-2 border-emerald-500/30 rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-all"
-              >
-                <option value="">-- Select Manufacturer --</option>
-                {MANUFACTURERS.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  value={manufacturer}
+                  onChange={(e) => setManufacturer(e.target.value)}
+                  className="flex-1 p-3 bg-slate-900/50 border-2 border-emerald-500/30 rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-all"
+                >
+                  <option value="">-- Select Manufacturer --</option>
+                  {MANUFACTURERS.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                  {customManufacturers.length > 0 && <option disabled>--- Custom ---</option>}
+                  {customManufacturers.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowManufacturerInput(!showManufacturerInput)}
+                  className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all font-bold"
+                  title="Add custom manufacturer"
+                >
+                  +
+                </button>
+              </div>
+              {showManufacturerInput && (
+                <div className="mt-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={newManufacturer}
+                    onChange={(e) => setNewManufacturer(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCustomManufacturer();
+                      }
+                    }}
+                    placeholder="Enter new manufacturer..."
+                    className="flex-1 p-2 bg-slate-900/50 border-2 border-blue-500/30 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomManufacturer}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-400 transition-all"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowManufacturerInput(false);
+                      setNewManufacturer('');
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-400 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+              {customManufacturers.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {customManufacturers.map((m) => (
+                    <span
+                      key={m}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 border border-blue-500/50 rounded text-xs text-blue-300"
+                    >
+                      {m}
+                      <button
+                        type="button"
+                        onClick={() => removeCustomManufacturer(m)}
+                        className="text-red-400 hover:text-red-300 font-bold"
+                        title="Remove custom manufacturer"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
@@ -501,18 +629,88 @@ const Scanner = () => {
                 </span>
                 Location
               </label>
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full p-3 bg-slate-900/50 border-2 border-emerald-500/30 rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-all"
-              >
-                <option value="">-- Select Location --</option>
-                {LOCATIONS.map((loc) => (
-                  <option key={loc} value={loc}>
-                    {loc}
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="flex-1 p-3 bg-slate-900/50 border-2 border-emerald-500/30 rounded-lg text-white focus:border-emerald-500 focus:outline-none transition-all"
+                >
+                  <option value="">-- Select Location --</option>
+                  {LOCATIONS.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                  {customLocations.length > 0 && <option disabled>--- Custom ---</option>}
+                  {customLocations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowLocationInput(!showLocationInput)}
+                  className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-all font-bold"
+                  title="Add custom location"
+                >
+                  +
+                </button>
+              </div>
+              {showLocationInput && (
+                <div className="mt-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={newLocation}
+                    onChange={(e) => setNewLocation(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCustomLocation();
+                      }
+                    }}
+                    placeholder="Enter new location..."
+                    className="flex-1 p-2 bg-slate-900/50 border-2 border-blue-500/30 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomLocation}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-400 transition-all"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowLocationInput(false);
+                      setNewLocation('');
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-400 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+              {customLocations.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {customLocations.map((loc) => (
+                    <span
+                      key={loc}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 border border-blue-500/50 rounded text-xs text-blue-300"
+                    >
+                      {loc}
+                      <button
+                        type="button"
+                        onClick={() => removeCustomLocation(loc)}
+                        className="text-red-400 hover:text-red-300 font-bold"
+                        title="Remove custom location"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
