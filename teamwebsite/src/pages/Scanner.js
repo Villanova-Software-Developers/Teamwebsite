@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { db } from '../contexts/AuthContext';
+import { doc, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+
+const SCANNER_CONFIG_REF = doc(db, 'scanner_config', 'options');
 
 const MANUFACTURERS = ['Vadio', 'Crestron', 'Extron', 'Epson', 'Biamp'];
 
@@ -127,25 +131,31 @@ const Scanner = () => {
   const mac1Ref = useRef(null);
   const mac2Ref = useRef(null);
 
-  // Load records from localStorage on mount
+  // Load records and room from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('scannerRecords');
-    if (saved) {
-      setRecords(JSON.parse(saved));
-    }
+    if (saved) setRecords(JSON.parse(saved));
+
     const savedRoom = localStorage.getItem('lastRoomNumber');
     if (savedRoom) {
       setLastRoomNumber(savedRoom);
       setRoomNumber(savedRoom);
     }
-    const savedCustomManufacturers = localStorage.getItem('customManufacturers');
-    if (savedCustomManufacturers) {
-      setCustomManufacturers(JSON.parse(savedCustomManufacturers));
-    }
-    const savedCustomLocations = localStorage.getItem('customLocations');
-    if (savedCustomLocations) {
-      setCustomLocations(JSON.parse(savedCustomLocations));
-    }
+
+    // Load custom options from Firestore
+    getDoc(SCANNER_CONFIG_REF).then((snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.customManufacturers?.length) setCustomManufacturers(data.customManufacturers);
+        if (data.customLocations?.length) setCustomLocations(data.customLocations);
+      }
+    }).catch(() => {
+      // Firestore unavailable — fall back to localStorage
+      const m = localStorage.getItem('customManufacturers');
+      if (m) setCustomManufacturers(JSON.parse(m));
+      const l = localStorage.getItem('customLocations');
+      if (l) setCustomLocations(JSON.parse(l));
+    });
   }, []);
 
   // Save records to localStorage whenever they change
@@ -158,16 +168,6 @@ const Scanner = () => {
     localStorage.setItem('lastRoomNumber', lastRoomNumber);
   }, [lastRoomNumber]);
 
-  // Save custom manufacturers to localStorage
-  useEffect(() => {
-    localStorage.setItem('customManufacturers', JSON.stringify(customManufacturers));
-  }, [customManufacturers]);
-
-  // Save custom locations to localStorage
-  useEffect(() => {
-    localStorage.setItem('customLocations', JSON.stringify(customLocations));
-  }, [customLocations]);
-
   const handleKeyDown = (e, nextRef, isLast = false) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -179,37 +179,53 @@ const Scanner = () => {
     }
   };
 
-  const addCustomManufacturer = () => {
+  const addCustomManufacturer = async () => {
     const trimmed = newManufacturer.trim();
     if (trimmed && !MANUFACTURERS.includes(trimmed) && !customManufacturers.includes(trimmed)) {
       setCustomManufacturers((prev) => [...prev, trimmed]);
       setManufacturer(trimmed);
       setNewManufacturer('');
       setShowManufacturerInput(false);
+      try {
+        await setDoc(SCANNER_CONFIG_REF, { customManufacturers: arrayUnion(trimmed) }, { merge: true });
+      } catch (err) {
+        console.error('Failed to save manufacturer:', err);
+      }
     }
   };
 
-  const addCustomLocation = () => {
+  const addCustomLocation = async () => {
     const trimmed = newLocation.trim();
     if (trimmed && !LOCATIONS.includes(trimmed) && !customLocations.includes(trimmed)) {
       setCustomLocations((prev) => [...prev, trimmed]);
       setLocation(trimmed);
       setNewLocation('');
       setShowLocationInput(false);
+      try {
+        await setDoc(SCANNER_CONFIG_REF, { customLocations: arrayUnion(trimmed) }, { merge: true });
+      } catch (err) {
+        console.error('Failed to save location:', err);
+      }
     }
   };
 
-  const removeCustomManufacturer = (value) => {
+  const removeCustomManufacturer = async (value) => {
     setCustomManufacturers((prev) => prev.filter((m) => m !== value));
-    if (manufacturer === value) {
-      setManufacturer('');
+    if (manufacturer === value) setManufacturer('');
+    try {
+      await setDoc(SCANNER_CONFIG_REF, { customManufacturers: arrayRemove(value) }, { merge: true });
+    } catch (err) {
+      console.error('Failed to remove manufacturer:', err);
     }
   };
 
-  const removeCustomLocation = (value) => {
+  const removeCustomLocation = async (value) => {
     setCustomLocations((prev) => prev.filter((l) => l !== value));
-    if (location === value) {
-      setLocation('');
+    if (location === value) setLocation('');
+    try {
+      await setDoc(SCANNER_CONFIG_REF, { customLocations: arrayRemove(value) }, { merge: true });
+    } catch (err) {
+      console.error('Failed to remove location:', err);
     }
   };
 
@@ -600,26 +616,6 @@ const Scanner = () => {
                   </button>
                 </div>
               )}
-              {customManufacturers.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {customManufacturers.map((m) => (
-                    <span
-                      key={m}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 border border-blue-500/50 rounded text-xs text-blue-300"
-                    >
-                      {m}
-                      <button
-                        type="button"
-                        onClick={() => removeCustomManufacturer(m)}
-                        className="text-red-400 hover:text-red-300 font-bold"
-                        title="Remove custom manufacturer"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div>
@@ -689,26 +685,6 @@ const Scanner = () => {
                   >
                     Cancel
                   </button>
-                </div>
-              )}
-              {customLocations.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {customLocations.map((loc) => (
-                    <span
-                      key={loc}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 border border-blue-500/50 rounded text-xs text-blue-300"
-                    >
-                      {loc}
-                      <button
-                        type="button"
-                        onClick={() => removeCustomLocation(loc)}
-                        className="text-red-400 hover:text-red-300 font-bold"
-                        title="Remove custom location"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
                 </div>
               )}
             </div>

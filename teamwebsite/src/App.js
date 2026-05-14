@@ -29,6 +29,7 @@ import InvestmentBankingGame from './pages/learning/InvestmentBankingGame';
 import CreditScoreGame from './pages/learning/CreditScoreGame';
 import EmergencyFundGame from './pages/learning/EmergencyFundGame';
 import Scanner from './pages/Scanner';
+import ScannerLogin from './pages/auth/ScannerLogin';
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -80,6 +81,24 @@ const ProtectedRoute = ({ children }) => {
 
   return isAuthorized ? children : null;
 };
+const ScannerProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-emerald-400 font-medium">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/scan/login" replace />;
+  }
+
+  return children;
+};
+
 // Session timeout HOC
 const withSessionTimeout = (WrappedComponent) => {
   return (props) => {
@@ -148,8 +167,18 @@ function App() {
           <Route path="/investment-banking" element={<InvestmentBankingGame />} />
           <Route path="/credit-score" element={<CreditScoreGame />} />
           <Route path="/emergency-fund" element={<EmergencyFundGame />} />
-          <Route path="/scan" element={<Scanner />} />
       </Route>
+
+      {/* Scanner Routes */}
+      <Route path="/scan/login" element={<ScannerLogin />} />
+      <Route
+        path="/scan"
+        element={
+          <ScannerProtectedRoute>
+            <Scanner />
+          </ScannerProtectedRoute>
+        }
+      />
 
       {/* Auth Routes */}
       <Route path="/admin/login" element={<Login />} />
